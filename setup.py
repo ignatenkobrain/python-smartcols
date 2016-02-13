@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
-from distutils.extension import Extension
+try:
+    from setuptools import setup, Extension
+except ImportError:
+    from distutils.core import setup
+    from distutils.extension import Extension
 import subprocess
 
 try:
@@ -10,6 +13,8 @@ except ImportError:
     USE_CYTHON = False
 else:
     USE_CYTHON = True
+
+VERSION = "0.0.1-dev"
 
 def pkgconfig(*packages, **kw):
     flag_map = {"-I": "include_dirs", "-L": "library_dirs", "-l": "libraries"}
@@ -22,12 +27,14 @@ def pkgconfig(*packages, **kw):
     return kw
 
 ext = ".pyx" if USE_CYTHON else ".c"
+if VERSION.endswith("-dev"):
+    debug = {"define_macros": [("CYTHON_TRACE", 1)]}
+else:
+    debug = {}
 extensions = [Extension("smartcols", ["smartcols"+ext],
-                        **pkgconfig("smartcols"))]
+                        **pkgconfig("smartcols"), **debug)]
 if USE_CYTHON:
     extensions = cythonize(extensions)
-
-VERSION = "0.0.1"
 
 setup(
     name="smartcols",

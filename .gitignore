@@ -1,4 +1,10 @@
+__pycache__/
+*.so
+*.egg-info
+
 /MANIFEST
 /build/
 /dist/
 /smartcols.c
+/.coverage
+/htmlcov/

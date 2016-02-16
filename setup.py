@@ -27,12 +27,10 @@ def pkgconfig(*packages, **kw):
     return kw
 
 ext = ".pyx" if USE_CYTHON else ".c"
+flags = pkgconfig("smartcols")
 if VERSION.endswith("-dev"):
-    debug = {"define_macros": [("CYTHON_TRACE", 1)]}
-else:
-    debug = {}
-extensions = [Extension("smartcols", ["smartcols"+ext],
-                        **pkgconfig("smartcols"), **debug)]
+    flags["define_macros"] = [("CYTHON_TRACE", 1)]
+extensions = [Extension("smartcols", ["smartcols"+ext], **flags)]
 if USE_CYTHON:
     extensions = cythonize(extensions)
 

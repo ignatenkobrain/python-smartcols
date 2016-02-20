@@ -266,10 +266,10 @@ cdef class Symbols:
     """
 
     cdef csmartcols.libscols_symbols* _c_symbols
-    cdef object __branch
-    cdef object __right
-    cdef object __vertical
-    cdef object __title_padding
+    cdef unicode __branch
+    cdef unicode __right
+    cdef unicode __vertical
+    cdef unicode __title_padding
 
     def __cinit__(self):
         self._c_symbols = csmartcols.scols_new_symbols()

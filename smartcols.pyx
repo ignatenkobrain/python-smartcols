@@ -21,10 +21,19 @@ cimport csmartcols
 from libc.stdlib cimport free
 
 cdef class Cell:
+    """
+    Cell.
+
+    There is no way to create cell, only way to get this object is from
+    :class:`smartcols.Line`.
+    """
 
     cdef csmartcols.libscols_cell* _c_cell
 
     property data:
+        """
+        Text in cell.
+        """
         def __get__(self):
             cdef const char* d = csmartcols.scols_cell_get_data(self._c_cell)
             return d if d is not NULL else None
@@ -35,6 +44,9 @@ cdef class Cell:
                 csmartcols.scols_cell_set_data(self._c_cell, NULL)
 
     property color:
+        """
+        Color for text in cell.
+        """
         def __get__(self):
             cdef const char* c = csmartcols.scols_cell_get_color(self._c_cell)
             return c if c is not NULL else None
@@ -50,8 +62,14 @@ cdef dict TitlePosition = {
     "right": csmartcols.SCOLS_CELL_FL_RIGHT}
 
 cdef class Title(Cell):
+    """
+    Title.
+    """
 
     property position:
+        """
+        Position. One of `left`, `center` or `right`.
+        """
         def __get__(self):
             cdef int pos = csmartcols.scols_cell_get_flags(self._c_cell)
             return next(k for k, v in TitlePosition.items() if v == pos)
@@ -63,6 +81,13 @@ cdef class Title(Cell):
                 raise KeyError("Position {} is not valid".format(position))
 
 cdef class Column:
+    """
+    __init__(self, name=None)
+    Column.
+
+    :param name: Column name
+    :type name: str
+    """
 
     cdef csmartcols.libscols_column* _c_column
 
@@ -85,24 +110,36 @@ cdef class Column:
             csmartcols.scols_column_set_flags(self._c_column, flags ^ flag)
 
     property trunc:
+        """
+        Truncate text in cells if necessary.
+        """
         def __get__(self):
             return csmartcols.scols_column_is_trunc(self._c_column)
         def __set__(self, bint value):
             self.set_flag(csmartcols.SCOLS_FL_TRUNC, value)
 
     property tree:
+        """
+        Use tree "ASCII Art".
+        """
         def __get__(self):
             return csmartcols.scols_column_is_tree(self._c_column)
         def __set__(self, bint value):
             self.set_flag(csmartcols.SCOLS_FL_TREE, value)
 
     property right:
+        """
+        Align text in cells to the right.
+        """
         def __get__(self):
             return csmartcols.scols_column_is_right(self._c_column)
         def __set__(self, bint value):
             self.set_flag(csmartcols.SCOLS_FL_RIGHT, value)
 
     property strict_width:
+        """
+        Do not reduce width if column is empty.
+        """
         def __get__(self):
             return csmartcols.scols_column_is_strict_width(self._c_column)
         def __set__(self, bint value):
@@ -115,18 +152,27 @@ cdef class Column:
             self.set_flag(csmartcols.SCOLS_FL_NOEXTREMES, value)
 
     property hidden:
+        """
+        Make column hidden for user.
+        """
         def __get__(self):
             return csmartcols.scols_column_is_hidden(self._c_column)
         def __set__(self, bint value):
             self.set_flag(csmartcols.SCOLS_FL_HIDDEN, value)
 
     property wrap:
+        """
+        Wrap long lines to multi-line cells.
+        """
         def __get__(self):
             return csmartcols.scols_column_is_wrap(self._c_column)
         def __set__(self, bint value):
             self.set_flag(csmartcols.SCOLS_FL_WRAP, value)
 
     property name:
+        """
+        The title of column. Used in table's header.
+        """
         def __get__(self):
             cdef Cell cell = Cell()
             cell._c_cell = csmartcols.scols_column_get_header(self._c_column)
@@ -137,6 +183,9 @@ cdef class Column:
             cell.data = name
 
     property color:
+        """
+        The default color for data cells in column and column header.
+        """
         def __get__(self):
             cdef const char* c = csmartcols.scols_column_get_color(self._c_column)
             return c if c is not NULL else None
@@ -147,12 +196,37 @@ cdef class Column:
                 csmartcols.scols_column_set_color(self._c_column, NULL)
 
     property whint:
+        """
+        Width hint of column.
+        """
         def __get__(self):
             return csmartcols.scols_column_get_whint(self._c_column)
         def __set__(self, double whint):
             csmartcols.scols_column_set_whint(self._c_column, whint)
 
 cdef class Line:
+    """
+    __init__(self, parent=None)
+    Line.
+
+    :param parent: Parent line (used if table has column with tree-output)
+    :type parent: smartcols.Line
+
+    Get cell
+
+        >>> table = smartcols.Table()
+        >>> column = table.new_column("FOO")
+        >>> line = table.new_line()
+        >>> line[column]
+        <smartcols.Cell object at 0x7f8fb6cc9900>
+
+    Set text to cell
+
+        >>> table = smartcols.Table()
+        >>> column = table.new_column("FOO")
+        >>> line = table.new_line()
+        >>> line[column] = "bar"
+    """
 
     cdef csmartcols.libscols_line* _c_line
 
@@ -174,6 +248,9 @@ cdef class Line:
         csmartcols.scols_line_set_column_data(self._c_line, column._c_column, data.encode("UTF-8"))
 
     property color:
+        """
+        The color for data cells in line.
+        """
         def __get__(self):
             cdef const char* c = csmartcols.scols_line_get_color(self._c_line)
             return c if c is not NULL else None
@@ -184,6 +261,9 @@ cdef class Line:
                 csmartcols.scols_line_set_color(self._c_line, NULL)
 
 cdef class Symbols:
+    """
+    Symbols.
+    """
 
     cdef csmartcols.libscols_symbols* _c_symbols
     cdef object __branch
@@ -200,6 +280,9 @@ cdef class Symbols:
             csmartcols.scols_unref_symbols(self._c_symbols)
 
     property branch:
+        """
+        String which represents the branch part of a tree output.
+        """
         def __get__(self):
             return self.__branch
         def __set__(self, unicode value):
@@ -210,6 +293,9 @@ cdef class Symbols:
             self.__branch = value
 
     property right:
+        """
+        Right part of a tree output.
+        """
         def __get__(self):
             return self.__right
         def __set__(self, unicode value):
@@ -220,6 +306,9 @@ cdef class Symbols:
             self.__right = value
 
     property vertical:
+        """
+        Vertical part of a tree output.
+        """
         def __get__(self):
             return self.__vertical
         def __set__(self, unicode value):
@@ -230,6 +319,9 @@ cdef class Symbols:
             self.__vertical = value
 
     property title_padding:
+        """
+        Padding of a table's title.
+        """
         def __get__(self):
             return self.__title_padding
         def __set__(self, unicode value):
@@ -240,6 +332,22 @@ cdef class Symbols:
             self.__title_padding = value
 
 cdef class Table:
+    """
+    Table.
+
+    Create and print table
+
+        >>> table = smartcols.Table()
+        >>> column_name = table.new_column("NAME")
+        >>> column_age = table.new_column("AGE")
+        >>> column_age.right = True
+        >>> ln = table.new_line()
+        >>> ln[column_name] = "Igor Gnatenko"
+        >>> ln[column_age] = "18"
+        >>> print(table)
+        NAME          AGE
+        Igor Gnatenko  18
+    """
 
     cdef csmartcols.libscols_table* _c_table
 
@@ -259,6 +367,12 @@ cdef class Table:
         return ret
 
     def json(self):
+        """
+        json(self)
+
+        :return: JSON dictionary
+        :rtype: dict
+        """
         csmartcols.scols_table_enable_json(self._c_table, True)
         from json import loads
         cdef dict ret = loads(self.__str__())
@@ -266,44 +380,96 @@ cdef class Table:
         return ret
 
     def add_column(self, Column column not None):
+        """
+        add_column(self, column)
+        Add column to the table.
+
+        :param column: Column
+        :type column: smartcols.Column
+        """
         csmartcols.scols_table_add_column(self._c_table, column._c_column)
     def new_column(self, *args, **kwargs):
+        """
+        new_column(self, *args, **kwargs)
+        Create and add column to the table.
+
+        The arguments are the same as for the :class:`smartcols.Column`
+        constructor.
+
+        :return: Column
+        :rtype: smartcols.Column
+        """
         cdef Column column = Column(*args, **kwargs)
         self.add_column(column)
         return column
 
     def add_line(self, Line line not None):
+        """
+        add_line(self, line)
+        Add line to the table.
+
+        :param line: Line
+        :type line: smartcols.Line
+        """
         csmartcols.scols_table_add_line(self._c_table, line._c_line)
     def new_line(self, *args, **kwargs):
+        """
+        new_line(self, *args, **kwargs)
+        Create and add line to the table.
+
+        The arguments are the same as for the :class:`smartcols.Line`
+        constructor.
+
+        :return: Line
+        :rtype: smartcols.Line
+        """
         cdef Line line = Line(*args, **kwargs)
         self.add_line(line)
         return line
 
     property ascii:
+        """
+        Force the library to use ASCII chars for the :class:`smartcols.Column`
+        with :attr:`smartcols.Column.tree` activated.
+        """
         def __get__(self):
             return csmartcols.scols_table_is_ascii(self._c_table)
         def __set__(self, bint value):
             csmartcols.scols_table_enable_ascii(self._c_table, value)
 
     property colors:
+        """
+        Enable/Disable colors.
+        """
         def __get__(self):
             return csmartcols.scols_table_colors_wanted(self._c_table)
         def __set__(self, bint value):
             csmartcols.scols_table_enable_colors(self._c_table, value)
 
     property maxout:
+        """
+        The extra space after last column is ignored by default. The output
+        maximization use the extra space for all columns. In short words - use
+        full width of terminal.
+        """
         def __get__(self):
             return csmartcols.scols_table_is_maxout(self._c_table)
         def __set__(self, bint value):
             csmartcols.scols_table_enable_maxout(self._c_table, value)
 
     property noheadings:
+        """
+        Do not print header.
+        """
         def __get__(self):
             return csmartcols.scols_table_is_noheadings(self._c_table)
         def __set__(self, bint value):
             csmartcols.scols_table_enable_noheadings(self._c_table, value)
 
     property column_separator:
+        """
+        Column separator.
+        """
         def __get__(self):
             cdef const char* sep = csmartcols.scols_table_get_column_separator(self._c_table)
             return sep if sep is not NULL else None
@@ -315,6 +481,9 @@ cdef class Table:
                 csmartcols.scols_table_set_column_separator(self._c_table, NULL)
 
     property line_separator:
+        """
+        Line separator.
+        """
         def __get__(self):
             cdef const char* sep = csmartcols.scols_table_get_line_separator(self._c_table)
             return sep if sep is not NULL else None
@@ -326,6 +495,9 @@ cdef class Table:
                 csmartcols.scols_table_set_line_separator(self._c_table, NULL)
 
     property title:
+        """
+        Title of the table. Printed before table. See :class:`smartcols.Title`.
+        """
         def __get__(self):
             cdef Title title = Title()
             title._c_cell = csmartcols.scols_table_get_title(self._c_table)

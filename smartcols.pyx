@@ -466,6 +466,16 @@ cdef class Table:
         def __set__(self, bint value):
             csmartcols.scols_table_enable_noheadings(self._c_table, value)
 
+    property symbols:
+        """
+        Used symbols. See :class:`smartcols.Symbols`.
+        """
+        def __set__(self, Symbols symbols):
+            if symbols is not None:
+                csmartcols.scols_table_set_symbols(self._c_table, symbols._c_symbols)
+            else:
+                csmartcols.scols_table_set_symbols(self._c_table, NULL)
+
     property column_separator:
         """
         Column separator.

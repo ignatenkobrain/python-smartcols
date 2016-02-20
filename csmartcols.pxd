@@ -74,6 +74,7 @@ cdef extern from "libsmartcols.h":
     int scols_table_enable_maxout(libscols_table* table, bint value)
     bint scols_table_is_noheadings(libscols_table* table)
     int scols_table_enable_noheadings(libscols_table* table, bint value)
+    int scols_table_set_symbols(libscols_table* table, libscols_symbols* symbols)
     char* scols_table_get_column_separator(libscols_table* table)
     int scols_table_set_column_separator(libscols_table* table, const char* separator)
     char* scols_table_get_line_separator(libscols_table* table)

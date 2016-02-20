@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 from setuptools import setup, Extension
 import subprocess
 
@@ -10,7 +11,7 @@ except ImportError:
 else:
     USE_CYTHON = True
 
-VERSION = "0.0.1.dev0"
+VERSION = "0.1.0.dev"
 
 def pkgconfig(*packages, **kw):
     flag_map = {"-I": "include_dirs", "-L": "library_dirs", "-l": "libraries"}
@@ -24,7 +25,7 @@ def pkgconfig(*packages, **kw):
 
 ext = ".pyx" if USE_CYTHON else ".c"
 flags = pkgconfig("smartcols")
-if VERSION.endswith("-dev"):
+if VERSION.endswith(".dev"):
     flags["define_macros"] = [("CYTHON_TRACE", 1)]
 extensions = [Extension("smartcols", ["smartcols"+ext], **flags)]
 if USE_CYTHON:

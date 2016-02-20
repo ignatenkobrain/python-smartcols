@@ -55,5 +55,6 @@ setup(
     maintainer_email="i.gnatenko.brain@gmail.com",
     url="https://github.com/ignatenkobrain/python-smartcols",
     download_url="https://github.com/ignatenkobrain/python-smartcols/archive/v{}.tar.gz".format(VERSION),
-    ext_modules=extensions
+    ext_modules=extensions,
+    test_suite="tests",
 )

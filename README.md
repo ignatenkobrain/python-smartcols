@@ -10,11 +10,18 @@ Building
 $ python setup.py build_ext --inplace
 ```
 
+Running tests
+-------------
+
+```
+$ python setup.py test
+```
+
 Running tests with coverage
 ---------------------------
 
 ```
-$ PYTHONPATH=. coverage tests/__init__.py
+$ PYTHONPATH=. coverage run tests.py
 $ coverage html
 ```
 

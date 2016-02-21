@@ -1,16 +1,11 @@
-smartcols module
-================
+Pretty output for everyone!
+===========================
 
-.. autoclass:: smartcols.Cell
+Contents:
 
-.. autoclass:: smartcols.Column
+.. toctree::
+   :maxdepth: 2
 
-.. autoclass:: smartcols.Line
-
-.. autoclass:: smartcols.Symbols
-
-.. autoclass:: smartcols.Title
-   :show-inheritance:
-
-.. autoclass:: smartcols.Table
+   reference
+   examples
 

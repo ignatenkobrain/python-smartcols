@@ -1,3 +1,8 @@
+from libc.stdio cimport FILE
+
+cdef extern from "stdio.h" nogil:
+    FILE* open_memstream(char** __bufloc, size_t* __sizeloc)
+
 cdef extern from "libsmartcols.h":
     cdef enum:
         SCOLS_CELL_FL_LEFT
@@ -63,6 +68,8 @@ cdef extern from "libsmartcols.h":
     libscols_table* scols_new_table()
     void scols_unref_table(libscols_table* table)
     int scols_print_table_to_string(libscols_table* table, char** data)
+    int scols_table_enable_nolinesep(libscols_table* table, bint enable)
+    int scols_table_print_range(libscols_table* table, libscols_line* start, libscols_line* end)
     int scols_table_enable_json(libscols_table* table, bint value)
     bint scols_table_is_ascii(libscols_table* table)
     int scols_table_add_column(libscols_table* table, libscols_column* column)
@@ -80,3 +87,6 @@ cdef extern from "libsmartcols.h":
     char* scols_table_get_line_separator(libscols_table* table)
     int scols_table_set_line_separator(libscols_table* table, const char* separator)
     libscols_cell* scols_table_get_title(libscols_table* table)
+
+    FILE* scols_table_get_stream(libscols_table* table)
+    int scols_table_set_stream(libscols_table* table, FILE* stream)

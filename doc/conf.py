@@ -271,8 +271,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'python-smartcols', 'Python bindings for the util-linux libsmartcols library',
-     [author], 1)
+    ('reference', 'python-smartcols', 'Python bindings for the util-linux libsmartcols library',
+     [author], 3)
 ]
 
 # If true, show URL addresses after external links.

@@ -19,6 +19,25 @@
 
 cimport csmartcols
 from libc.stdlib cimport free
+from libc.stdio cimport FILE, fclose
+from libc.errno cimport EINVAL, ENOMEM
+
+cdef inline int scols_table_print_range_to_string(csmartcols.libscols_table* table, csmartcols.libscols_line* start, csmartcols.libscols_line* end, char** data):
+        if table is NULL:
+            return -EINVAL
+
+        # create a stream for output
+        cdef size_t sz
+        cdef FILE* stream = csmartcols.open_memstream(data, &sz)
+        if stream is NULL:
+            return -ENOMEM
+
+        cdef FILE* old_stream = csmartcols.scols_table_get_stream(table)
+        csmartcols.scols_table_set_stream(table, stream)
+        csmartcols.scols_table_print_range(table, start, end)
+        fclose(stream)
+        csmartcols.scols_table_set_stream(table, old_stream)
+
 
 cdef class Cell:
     """
@@ -360,8 +379,35 @@ cdef class Table:
             csmartcols.scols_unref_table(self._c_table)
 
     def __str__(self):
+        """
+        __str__(self)
+        Print table to string.
+
+        :return: Table
+        :rtype: string
+        """
         cdef char* data = NULL
         csmartcols.scols_print_table_to_string(self._c_table, &data)
+        cdef unicode ret = data
+        free(data)
+        return ret
+
+    def str_line(self, Line start=None, Line end=None):
+        """
+        str_line(self, start=None, end=None)
+        Print range of lines of the table to string including header.
+
+        :param start: First printed line or None to print from begin of the table
+        :type start: smartcols.Line
+        :param end: Last printed line or None to print all lines from `start`
+        :type end: smartcols.Line
+        :return: Lines
+        :rtype: str
+        """
+        cdef char* data = NULL
+        csmartcols.scols_table_enable_nolinesep(self._c_table, True)
+        scols_table_print_range_to_string(self._c_table, start._c_line if start is not None else NULL, end._c_line if end is not None else NULL, &data)
+        csmartcols.scols_table_enable_nolinesep(self._c_table, False)
         cdef unicode ret = data
         free(data)
         return ret

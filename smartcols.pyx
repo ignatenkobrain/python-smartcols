@@ -281,6 +281,7 @@ cdef class Line:
 
 cdef class Symbols:
     """
+    __init__(self)
     Symbols.
     """
 
@@ -352,6 +353,7 @@ cdef class Symbols:
 
 cdef class Table:
     """
+    __init__(self)
     Table.
 
     Create and print table

@@ -9,3 +9,9 @@ Contents:
    reference
    examples
 
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`search`
+

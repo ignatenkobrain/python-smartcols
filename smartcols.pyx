@@ -360,7 +360,7 @@ cdef class Table:
             csmartcols.scols_unref_table(self._c_table)
 
     def __str__(self):
-        cdef char* data = NULL;
+        cdef char* data = NULL
         csmartcols.scols_print_table_to_string(self._c_table, &data)
         cdef unicode ret = data
         free(data)

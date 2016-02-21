@@ -2,6 +2,7 @@ __pycache__/
 *.so
 *.egg-info
 
+/cython_debug/
 /MANIFEST
 /build/
 /dist/

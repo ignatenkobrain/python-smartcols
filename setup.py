@@ -29,7 +29,7 @@ if VERSION.endswith(".dev"):
     flags["define_macros"] = [("CYTHON_TRACE", 1)]
 extensions = [Extension("smartcols", ["smartcols"+ext], **flags)]
 if USE_CYTHON:
-    extensions = cythonize(extensions)
+    extensions = cythonize(extensions, gdb_debug=VERSION.endswith(".dev"))
 
 setup(
     name="smartcols",

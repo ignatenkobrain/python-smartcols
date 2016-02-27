@@ -9,10 +9,14 @@ TIME_PERIOD = 3.0
 
 if __name__ == "__main__":
     tb = smartcols.Table()
+    tb.maxout = True
     cl_num = tb.new_column("#NUM")
+    cl_num.whint = 0.1
     cl_num.right = True
     cl_data = tb.new_column("DATA")
+    cl_data.whint = 0.7
     cl_time = tb.new_column("TIME")
+    cl_time.whint = 0.2
 
     last = time.time()
     for i in range(10):

@@ -1,6 +1,12 @@
 Examples
 ========
 
+Table with title
+----------------
+
+.. literalinclude:: ../examples/title.py
+   :linenos:
+
 Wrapping lines in table
 -----------------------
 

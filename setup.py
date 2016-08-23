@@ -11,7 +11,8 @@ except ImportError:
 else:
     USE_CYTHON = True
 
-VERSION = "0.1.0.dev"
+VERSION = "0.1.1"
+DEBUG = False
 
 def pkgconfig(*packages, **kw):
     flag_map = {"-I": "include_dirs", "-L": "library_dirs", "-l": "libraries"}
@@ -25,11 +26,11 @@ def pkgconfig(*packages, **kw):
 
 ext = ".pyx" if USE_CYTHON else ".c"
 flags = pkgconfig("smartcols")
-if VERSION.endswith(".dev"):
+if DEBUG:
     flags["define_macros"] = [("CYTHON_TRACE", 1)]
 extensions = [Extension("smartcols", ["smartcols"+ext], **flags)]
 if USE_CYTHON:
-    extensions = cythonize(extensions, gdb_debug=VERSION.endswith(".dev"))
+    extensions = cythonize(extensions, gdb_debug=DEBUG)
 
 setup(
     name="smartcols",

@@ -11,8 +11,8 @@ except ImportError:
 else:
     USE_CYTHON = True
 
-VERSION = "0.1.1"
-DEBUG = False
+VERSION = "0.1.2.dev0"
+DEBUG = True
 
 def pkgconfig(*packages, **kw):
     flag_map = {"-I": "include_dirs", "-L": "library_dirs", "-l": "libraries"}

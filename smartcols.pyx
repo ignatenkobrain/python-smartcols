@@ -89,7 +89,7 @@ cdef class Title(Cell):
             if pos is not None:
                 csmartcols.scols_cell_set_flags(self._c_cell, pos)
             else:
-                raise KeyError("Position {} is not valid".format(position))
+                raise KeyError("Position {!r} is not valid".format(position))
 
 cdef class Column:
     """

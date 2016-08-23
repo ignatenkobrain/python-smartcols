@@ -17,8 +17,19 @@
 #
 # cython: c_string_type=unicode, c_string_encoding=utf8, linetrace=True
 
-cimport csmartcols
+from cpython.version cimport PY_MAJOR_VERSION
 from libc.stdlib cimport free
+
+cimport csmartcols
+
+cdef basestring str_or_unicode(const char* data):
+    # Workaround for https://github.com/cython/cython/issues/1448
+    cdef basestring ret
+    if PY_MAJOR_VERSION < 3:
+        ret = <str>data
+    else:
+        ret = <basestring>data
+    return ret
 
 cdef class Cell:
     """
@@ -37,7 +48,7 @@ cdef class Cell:
         def __get__(self):
             cdef const char* d = csmartcols.scols_cell_get_data(self._c_cell)
             return d if d is not NULL else None
-        def __set__(self, unicode data):
+        def __set__(self, basestring data):
             if data is not None:
                 csmartcols.scols_cell_set_data(self._c_cell, data.encode("UTF-8"))
             else:
@@ -50,7 +61,7 @@ cdef class Cell:
         def __get__(self):
             cdef const char* c = csmartcols.scols_cell_get_color(self._c_cell)
             return c if c is not NULL else None
-        def __set__(self, unicode color):
+        def __set__(self, basestring color):
             if color is not None:
                 csmartcols.scols_cell_set_color(self._c_cell, color.encode("UTF-8"))
             else:
@@ -73,7 +84,7 @@ cdef class Title(Cell):
         def __get__(self):
             cdef int pos = csmartcols.scols_cell_get_flags(self._c_cell)
             return next(k for k, v in TitlePosition.items() if v == pos)
-        def __set__(self, unicode position not None):
+        def __set__(self, basestring position not None):
             pos = TitlePosition.get(position)
             if pos is not None:
                 csmartcols.scols_cell_set_flags(self._c_cell, pos)
@@ -91,7 +102,7 @@ cdef class Column:
 
     cdef csmartcols.libscols_column* _c_column
 
-    def __cinit__(self, unicode name=None):
+    def __cinit__(self, basestring name=None):
         self._c_column = csmartcols.scols_new_column()
         if self._c_column is NULL:
             raise MemoryError()
@@ -177,7 +188,7 @@ cdef class Column:
             cdef Cell cell = Cell()
             cell._c_cell = csmartcols.scols_column_get_header(self._c_column)
             return cell.data
-        def __set__(self, unicode name):
+        def __set__(self, basestring name):
             cdef Cell cell = Cell()
             cell._c_cell = csmartcols.scols_column_get_header(self._c_column)
             cell.data = name
@@ -189,7 +200,7 @@ cdef class Column:
         def __get__(self):
             cdef const char* c = csmartcols.scols_column_get_color(self._c_column)
             return c if c is not NULL else None
-        def __set__(self, unicode color):
+        def __set__(self, basestring color):
             if color is not None:
                 csmartcols.scols_column_set_color(self._c_column, color.encode("UTF-8"))
             else:
@@ -244,7 +255,7 @@ cdef class Line:
         cdef Cell cell = Cell()
         cell._c_cell = csmartcols.scols_line_get_column_cell(self._c_line, column._c_column)
         return cell
-    def __setitem__(self, Column column not None, unicode data):
+    def __setitem__(self, Column column not None, basestring data):
         csmartcols.scols_line_set_column_data(self._c_line, column._c_column, data.encode("UTF-8"))
 
     property color:
@@ -254,7 +265,7 @@ cdef class Line:
         def __get__(self):
             cdef const char* c = csmartcols.scols_line_get_color(self._c_line)
             return c if c is not NULL else None
-        def __set__(self, unicode color):
+        def __set__(self, basestring color):
             if color is not None:
                 csmartcols.scols_line_set_color(self._c_line, color.encode("UTF-8"))
             else:
@@ -267,10 +278,10 @@ cdef class Symbols:
     """
 
     cdef csmartcols.libscols_symbols* _c_symbols
-    cdef unicode __branch
-    cdef unicode __right
-    cdef unicode __vertical
-    cdef unicode __title_padding
+    cdef basestring __branch
+    cdef basestring __right
+    cdef basestring __vertical
+    cdef basestring __title_padding
 
     def __cinit__(self):
         self._c_symbols = csmartcols.scols_new_symbols()
@@ -286,7 +297,7 @@ cdef class Symbols:
         """
         def __get__(self):
             return self.__branch
-        def __set__(self, unicode value):
+        def __set__(self, basestring value):
             if value is not None:
                 csmartcols.scols_symbols_set_branch(self._c_symbols, value.encode("UTF-8"))
             else:
@@ -299,7 +310,7 @@ cdef class Symbols:
         """
         def __get__(self):
             return self.__right
-        def __set__(self, unicode value):
+        def __set__(self, basestring value):
             if value is not None:
                 csmartcols.scols_symbols_set_right(self._c_symbols, value.encode("UTF-8"))
             else:
@@ -312,7 +323,7 @@ cdef class Symbols:
         """
         def __get__(self):
             return self.__vertical
-        def __set__(self, unicode value):
+        def __set__(self, basestring value):
             if value is not None:
                 csmartcols.scols_symbols_set_vertical(self._c_symbols, value.encode("UTF-8"))
             else:
@@ -325,7 +336,7 @@ cdef class Symbols:
         """
         def __get__(self):
             return self.__title_padding
-        def __set__(self, unicode value):
+        def __set__(self, basestring value):
             if value is not None:
                 csmartcols.scols_symbols_set_title_padding(self._c_symbols, value.encode("UTF-8"))
             else:
@@ -371,7 +382,7 @@ cdef class Table:
         """
         cdef char* data = NULL
         csmartcols.scols_print_table_to_string(self._c_table, &data)
-        cdef unicode ret = data
+        cdef basestring ret = str_or_unicode(data)
         free(data)
         return ret
 
@@ -391,7 +402,7 @@ cdef class Table:
         csmartcols.scols_table_enable_nolinesep(self._c_table, True)
         csmartcols.scols_table_print_range_to_string(self._c_table, start._c_line if start is not None else NULL, end._c_line if end is not None else NULL, &data)
         csmartcols.scols_table_enable_nolinesep(self._c_table, False)
-        cdef unicode ret = data
+        cdef basestring ret = str_or_unicode(data)
         free(data)
         return ret
 
@@ -541,5 +552,5 @@ cdef class Table:
             cdef Title title = Title()
             title._c_cell = csmartcols.scols_table_get_title(self._c_table)
             return title
-        def __set__(self, unicode title):
+        def __set__(self, basestring title):
             self.title.data = title

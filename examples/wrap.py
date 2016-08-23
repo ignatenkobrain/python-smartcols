@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 
 from __future__ import print_function, unicode_literals
+import locale
 
 import smartcols
 
 if __name__ == "__main__":
+    locale.setlocale(locale.LC_ALL, '')
+
     tb = smartcols.Table()
     tb.colors = True
 

@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 
 from __future__ import division, print_function, unicode_literals
+import locale
+import time
 
 import smartcols
-import time
 
 TIME_PERIOD = 3.0
 
 if __name__ == "__main__":
+    locale.setlocale(locale.LC_ALL, '')
+
     tb = smartcols.Table()
     tb.maxout = True
     cl_num = tb.new_column("#NUM")

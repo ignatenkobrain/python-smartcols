@@ -22,15 +22,6 @@ from libc.stdlib cimport free
 
 cimport csmartcols
 
-cdef basestring str_or_unicode(const char* data):
-    # Workaround for https://github.com/cython/cython/issues/1448
-    cdef basestring ret
-    if PY_MAJOR_VERSION < 3:
-        ret = <str>data
-    else:
-        ret = <basestring>data
-    return ret
-
 cdef class Cell:
     """
     Cell.
@@ -382,7 +373,7 @@ cdef class Table:
         """
         cdef char* data = NULL
         csmartcols.scols_print_table_to_string(self._c_table, &data)
-        cdef basestring ret = str_or_unicode(data)
+        cdef str ret = data
         free(data)
         return ret
 
@@ -402,7 +393,7 @@ cdef class Table:
         csmartcols.scols_table_enable_nolinesep(self._c_table, True)
         csmartcols.scols_table_print_range_to_string(self._c_table, start._c_line if start is not None else NULL, end._c_line if end is not None else NULL, &data)
         csmartcols.scols_table_enable_nolinesep(self._c_table, False)
-        cdef basestring ret = str_or_unicode(data)
+        cdef str ret = data
         free(data)
         return ret
 

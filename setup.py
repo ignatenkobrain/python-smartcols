@@ -1,15 +1,10 @@
 #!/usr/bin/env python
 
 import os
-from setuptools import setup, Extension
 import subprocess
 
-try:
-    from Cython.Build import cythonize
-except ImportError:
-    USE_CYTHON = False
-else:
-    USE_CYTHON = True
+from Cython.Build import cythonize
+from setuptools import setup, Extension
 
 VERSION = "0.1.2.dev0"
 DEBUG = True
@@ -24,13 +19,10 @@ def pkgconfig(*packages, **kw):
             kw.setdefault("extra_compile_args", []).append(token)
     return kw
 
-ext = ".pyx" if USE_CYTHON else ".c"
 flags = pkgconfig("smartcols")
 if DEBUG:
     flags["define_macros"] = [("CYTHON_TRACE", 1)]
-extensions = [Extension("smartcols", ["smartcols"+ext], **flags)]
-if USE_CYTHON:
-    extensions = cythonize(extensions, gdb_debug=DEBUG)
+extensions = [Extension("smartcols", ["smartcols.pyx"], **flags)]
 
 setup(
     name="smartcols",
@@ -56,6 +48,6 @@ setup(
     maintainer_email="i.gnatenko.brain@gmail.com",
     url="https://github.com/ignatenkobrain/python-smartcols",
     download_url="https://github.com/ignatenkobrain/python-smartcols/archive/v{}.tar.gz".format(VERSION),
-    ext_modules=extensions,
+    ext_modules=cythonize(extensions, gdb_debug=DEBUG),
     test_suite="tests",
 )

@@ -1,4 +1,6 @@
 cdef extern from "libsmartcols.h":
+    void scols_init_debug(int mask)
+
     cdef enum:
         SCOLS_CELL_FL_LEFT
         SCOLS_CELL_FL_CENTER

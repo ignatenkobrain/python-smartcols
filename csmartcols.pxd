@@ -20,6 +20,7 @@ cdef extern from "libsmartcols.h":
         SCOLS_FL_NOEXTREMES
         SCOLS_FL_HIDDEN
         SCOLS_FL_WRAP
+        SCOLS_FL_WRAPNL
     cdef struct libscols_column:
         pass
     libscols_column* scols_new_column()
@@ -33,6 +34,7 @@ cdef extern from "libsmartcols.h":
     bint scols_column_is_noextremes(libscols_column* column)
     bint scols_column_is_hidden(libscols_column* column)
     bint scols_column_is_wrap(libscols_column* column)
+    bint scols_column_is_wrapnl(libscols_column* column)
     libscols_cell* scols_column_get_header(libscols_column* column)
     const char* scols_column_get_color(libscols_column* column)
     int scols_column_set_color(libscols_column* column, const char* color)

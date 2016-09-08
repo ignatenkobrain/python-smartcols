@@ -9,17 +9,24 @@ from setuptools import setup, Extension
 VERSION = "0.1.2.dev0"
 DEBUG = True
 
-def pkgconfig(*packages, **kw):
+def pkgconfig(package, min_version=None, **kw):
     flag_map = {"-I": "include_dirs", "-L": "library_dirs", "-l": "libraries"}
-    for token in subprocess.check_output(["pkg-config", "--libs", "--cflags"] + list(packages)).split():
-        token = token.decode()
+    # Does .pc exist?
+    subprocess.check_call(["pkg-config", "--exists", package])
+    if min_version:
+        # Does it fulfil version requirement?
+        subprocess.check_call(["pkg-config", "--atleast-version", min_version, package])
+    # Get parse everything else
+    tokens = subprocess.check_output(["pkg-config", "--libs", "--cflags", package],
+                                     universal_newlines=True)
+    for token in tokens.split():
         if token[:2] in flag_map:
             kw.setdefault(flag_map.get(token[:2]), []).append(token[2:])
         else:
             kw.setdefault("extra_compile_args", []).append(token)
     return kw
 
-flags = pkgconfig("smartcols")
+flags = pkgconfig("smartcols", "2.29")
 if DEBUG:
     flags["define_macros"] = [("CYTHON_TRACE", 1)]
 extensions = [Extension("smartcols", ["smartcols.pyx"], **flags)]

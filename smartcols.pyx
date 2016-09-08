@@ -171,6 +171,15 @@ cdef class Column:
         def __set__(self, bint value):
             self.set_flag(csmartcols.SCOLS_FL_WRAP, value)
 
+    property wrapnl:
+        """
+        Wrap long lines to multi-line cells based on newline (``\n``).
+        """
+        def __get__(self):
+            return csmartcols.scols_column_is_wrapnl(self._c_column)
+        def __set__(self, bint value):
+            self.set_flag(csmartcols.SCOLS_FL_WRAPNL, value)
+
     property name:
         """
         The title of column. Used in table's header.

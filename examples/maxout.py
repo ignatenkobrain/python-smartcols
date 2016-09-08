@@ -4,7 +4,7 @@ import locale
 import smartcols
 
 if __name__ == "__main__":
-    locale.setlocale(locale.LC_ALL, '')
+    locale.setlocale(locale.LC_ALL, "")
 
     tb = smartcols.Table()
     tb.maxout = True

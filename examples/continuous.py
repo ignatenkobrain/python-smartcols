@@ -7,7 +7,7 @@ import smartcols
 TIME_PERIOD = 3.0
 
 if __name__ == "__main__":
-    locale.setlocale(locale.LC_ALL, '')
+    locale.setlocale(locale.LC_ALL, "")
 
     tb = smartcols.Table()
     tb.maxout = True
@@ -38,7 +38,7 @@ if __name__ == "__main__":
 
             s = tb.str_line(ln)
             if not done:
-                print("{}\r".format(s), end='')
+                print("{}\r".format(s), end="")
             else:
                 print(s)
 

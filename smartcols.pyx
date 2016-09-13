@@ -17,7 +17,6 @@
 #
 # cython: c_string_type=unicode, c_string_encoding=utf8, linetrace=True
 
-from cpython.version cimport PY_MAJOR_VERSION
 from libc.stdlib cimport free
 
 cimport csmartcols

@@ -121,3 +121,14 @@ cdef extern from "libsmartcols.h":
     int                 scols_table_set_line_separator    (libscols_table      *table,
                                                            const char          *separator)
     libscols_cell      *scols_table_get_title             (libscols_table      *table)
+
+    cdef enum:
+        SCOLS_TERMFORCE_AUTO
+        SCOLS_TERMFORCE_NEVER
+        SCOLS_TERMFORCE_ALWAYS
+    int                 scols_table_get_termforce         (libscols_table      *table)
+    int                 scols_table_set_termforce         (libscols_table      *table,
+                                                           int                  force)
+    size_t              scols_table_get_termwidth         (libscols_table      *table)
+    int                 scols_table_set_termwidth         (libscols_table      *table,
+                                                           size_t               width)

@@ -76,11 +76,7 @@ cdef class Title(Cell):
             cdef int pos = csmartcols.scols_cell_get_flags(self._c_cell)
             return next(k for k, v in TitlePosition.items() if v == pos)
         def __set__(self, basestring position not None):
-            pos = TitlePosition.get(position)
-            if pos is not None:
-                csmartcols.scols_cell_set_flags(self._c_cell, pos)
-            else:
-                raise KeyError("Position {!r} is not valid".format(position))
+            csmartcols.scols_cell_set_flags(self._c_cell, TitlePosition[position])
 
 cdef class Column:
     """
@@ -357,6 +353,11 @@ cdef class Symbols:
                 csmartcols.scols_symbols_set_cell_padding(self._c_symbols, NULL)
             self.__cell_padding = value
 
+cdef dict TableTermForce = {
+    "auto": csmartcols.SCOLS_TERMFORCE_AUTO,
+    "never": csmartcols.SCOLS_TERMFORCE_NEVER,
+    "always": csmartcols.SCOLS_TERMFORCE_ALWAYS}
+
 cdef class Table:
     """
     __init__(self)
@@ -568,3 +569,23 @@ cdef class Table:
             return title
         def __set__(self, basestring title):
             self.title.data = title
+
+    property termforce:
+        """
+        Force terminal output. One of `auto`, `never`, `always`.
+        """
+        def __get__(self):
+            cdef int force = csmartcols.scols_table_get_termforce(self._c_table)
+            return next(k for k, v in TableTermForce.items() if v == force)
+        def __set__(self, basestring force not None):
+            csmartcols.scols_table_set_termforce(self._c_table, TableTermForce[force])
+
+    property termwidth:
+        """
+        Terminal width. The library automatically detects terminal, in case of
+        failure it uses 80 characters. You can override terminal width here.
+        """
+        def __get__(self):
+            return csmartcols.scols_table_get_termwidth(self._c_table)
+        def __set__(self, size_t width):
+            csmartcols.scols_table_set_termwidth(self._c_table, width)

@@ -30,14 +30,14 @@ cdef class Cell:
     :class:`smartcols.Line`.
     """
 
-    cdef csmartcols.libscols_cell* _c_cell
+    cdef csmartcols.libscols_cell *_c_cell
 
     property data:
         """
         Text in cell.
         """
         def __get__(self):
-            cdef const char* d = csmartcols.scols_cell_get_data(self._c_cell)
+            cdef const char *d = csmartcols.scols_cell_get_data(self._c_cell)
             return d if d is not NULL else None
         def __set__(self, basestring data):
             if data is not None:
@@ -50,7 +50,7 @@ cdef class Cell:
         Color for text in cell.
         """
         def __get__(self):
-            cdef const char* c = csmartcols.scols_cell_get_color(self._c_cell)
+            cdef const char *c = csmartcols.scols_cell_get_color(self._c_cell)
             return c if c is not NULL else None
         def __set__(self, basestring color):
             if color is not None:
@@ -91,7 +91,7 @@ cdef class Column:
     :type name: str
     """
 
-    cdef csmartcols.libscols_column* _c_column
+    cdef csmartcols.libscols_column *_c_column
 
     def __cinit__(self, basestring name=None):
         self._c_column = csmartcols.scols_new_column()
@@ -198,7 +198,7 @@ cdef class Column:
         The default color for data cells in column and column header.
         """
         def __get__(self):
-            cdef const char* c = csmartcols.scols_column_get_color(self._c_column)
+            cdef const char *c = csmartcols.scols_column_get_color(self._c_column)
             return c if c is not NULL else None
         def __set__(self, basestring color):
             if color is not None:
@@ -239,7 +239,7 @@ cdef class Line:
         >>> line[column] = "bar"
     """
 
-    cdef csmartcols.libscols_line* _c_line
+    cdef csmartcols.libscols_line *_c_line
 
     def __cinit__(self, Line parent=None):
         self._c_line = csmartcols.scols_new_line()
@@ -263,7 +263,7 @@ cdef class Line:
         The color for data cells in line.
         """
         def __get__(self):
-            cdef const char* c = csmartcols.scols_line_get_color(self._c_line)
+            cdef const char *c = csmartcols.scols_line_get_color(self._c_line)
             return c if c is not NULL else None
         def __set__(self, basestring color):
             if color is not None:
@@ -277,7 +277,7 @@ cdef class Symbols:
     Symbols.
     """
 
-    cdef csmartcols.libscols_symbols* _c_symbols
+    cdef csmartcols.libscols_symbols *_c_symbols
     cdef basestring __branch
     cdef basestring __right
     cdef basestring __vertical
@@ -376,7 +376,7 @@ cdef class Table:
         Igor Gnatenko  18
     """
 
-    cdef csmartcols.libscols_table* _c_table
+    cdef csmartcols.libscols_table *_c_table
 
     def __cinit__(self):
         self._c_table = csmartcols.scols_new_table()
@@ -394,7 +394,7 @@ cdef class Table:
         :return: Table
         :rtype: string
         """
-        cdef char* data = NULL
+        cdef char *data = NULL
         csmartcols.scols_print_table_to_string(self._c_table, &data)
         cdef str ret = data
         free(data)
@@ -412,7 +412,7 @@ cdef class Table:
         :return: Lines
         :rtype: str
         """
-        cdef char* data = NULL
+        cdef char *data = NULL
         csmartcols.scols_table_enable_nolinesep(self._c_table, True)
         csmartcols.scols_table_print_range_to_string(self._c_table, start._c_line if start is not None else NULL, end._c_line if end is not None else NULL, &data)
         csmartcols.scols_table_enable_nolinesep(self._c_table, False)
@@ -535,7 +535,7 @@ cdef class Table:
         Column separator.
         """
         def __get__(self):
-            cdef const char* sep = csmartcols.scols_table_get_column_separator(self._c_table)
+            cdef const char *sep = csmartcols.scols_table_get_column_separator(self._c_table)
             return sep if sep is not NULL else None
         def __set__(self, separator):
             csmartcols.scols_table_set_column_separator(self._c_table, separator)
@@ -549,7 +549,7 @@ cdef class Table:
         Line separator.
         """
         def __get__(self):
-            cdef const char* sep = csmartcols.scols_table_get_line_separator(self._c_table)
+            cdef const char *sep = csmartcols.scols_table_get_line_separator(self._c_table)
             return sep if sep is not NULL else None
         def __set__(self, separator):
             csmartcols.scols_table_set_line_separator(self._c_table, separator)

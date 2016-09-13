@@ -61,6 +61,7 @@ cdef extern from "libsmartcols.h":
     int scols_symbols_set_right(libscols_symbols* symbols, const char* s)
     int scols_symbols_set_vertical(libscols_symbols* symbols, const char* s)
     int scols_symbols_set_title_padding(libscols_symbols* symbols, const char* s)
+    int scols_symbols_set_cell_padding(libscols_symbols* symbols, const char* s)
 
     cdef struct libscols_table:
         pass

@@ -282,6 +282,7 @@ cdef class Symbols:
     cdef basestring __right
     cdef basestring __vertical
     cdef basestring __title_padding
+    cdef basestring __cell_padding
 
     def __cinit__(self):
         self._c_symbols = csmartcols.scols_new_symbols()
@@ -342,6 +343,19 @@ cdef class Symbols:
             else:
                 csmartcols.scols_symbols_set_title_padding(self._c_symbols, NULL)
             self.__title_padding = value
+
+    property cell_padding:
+        """
+        Padding of a table's cells.
+        """
+        def __get__(self):
+            return self.__cell_padding
+        def __set__(self, basestring value):
+            if value is not None:
+                csmartcols.scols_symbols_set_cell_padding(self._c_symbols, value.encode("UTF-8"))
+            else:
+                csmartcols.scols_symbols_set_cell_padding(self._c_symbols, NULL)
+            self.__cell_padding = value
 
 cdef class Table:
     """

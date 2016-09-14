@@ -20,7 +20,29 @@
 from libc.stdlib cimport malloc, free
 from libc.string cimport strcmp
 
+from warnings import warn
+
 cimport csmartcols
+
+cdef bint DEBUG_INITIALIZED = False
+
+cpdef void init_debug(int mask=0):
+    """
+    init_debug(mask=0)
+    Initialize debugging features. If `mask` equals to 0, then this function
+    reads the `LIBSMARTCOLS_DEBUG` environment variable to get mask.
+
+    Don't call this function multiple times.
+
+    :param int mask: Debug mask (0xffff to enable full debugging)
+    """
+    global DEBUG_INITIALIZED
+    if DEBUG_INITIALIZED:
+        warn("Calling smartcols.init_debug() multiple times has no effect. "
+             "First call initializes debugging features.", RuntimeWarning)
+    else:
+        csmartcols.scols_init_debug(mask)
+        DEBUG_INITIALIZED = True
 
 cdef struct CmpPayload:
     void *data

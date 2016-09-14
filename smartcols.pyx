@@ -17,9 +17,42 @@
 #
 # cython: c_string_type=unicode, c_string_encoding=utf8, linetrace=True
 
-from libc.stdlib cimport free
+from libc.stdlib cimport malloc, free
+from libc.string cimport strcmp
 
 cimport csmartcols
+
+cdef struct CmpPayload:
+    void *data
+    void *func
+
+cpdef int cmpfunc_strcmp(basestring s1, basestring s2, object data=None):
+    """
+    cmpfunc_strcmp(s1, s2, data=None)
+    Shorthand wrapper around strcmp(). `data` is ignored.
+
+    :param str s1: First string
+    :param str s2: Second string
+    :param object data: (unused) Additional data
+    """
+    # Must be same as scols_cmpstr_cells().
+    if not s1 and not s2:
+        return 0
+    if not s1:
+        return -1
+    if not s2:
+        return 1
+    return strcmp(s1.encode("UTF-8"), s2.encode("UTF-8"))
+
+cdef int cmpfunc_wrapper(csmartcols.libscols_cell *a, csmartcols.libscols_cell *b, void *data):
+    if a == b:
+        return 0
+
+    cdef const char *adata = csmartcols.scols_cell_get_data(a)
+    cdef const char *bdata = csmartcols.scols_cell_get_data(b)
+    cdef CmpPayload *payload = <CmpPayload *>data
+
+    return (<object>payload.func)(adata, bdata, <object>payload.data)
 
 cdef class Cell:
     """
@@ -87,6 +120,7 @@ cdef class Column:
     """
 
     cdef csmartcols.libscols_column *_c_column
+    cdef CmpPayload *_cmp_payload
 
     def __cinit__(self, basestring name=None):
         self._c_column = csmartcols.scols_new_column()
@@ -97,6 +131,29 @@ cdef class Column:
     def __dealloc__(self):
         if self._c_column is not NULL:
             csmartcols.scols_unref_column(self._c_column)
+        if self._cmp_payload is not NULL:
+            free(self._cmp_payload)
+
+    def set_cmpfunc(self, object func not None, object data=None):
+        """
+        set_cmpfunc(self, func, data=None)
+        Set sorting function for the column. If `func` is None then default
+        (strcmp-based) comparator will be used.
+
+        :param function func: Comparison function (s1, s2, data)
+        :param object data: Additional data for function
+        """
+        if self._cmp_payload is not NULL:
+            free(self._cmp_payload)
+        if func == cmpfunc_strcmp:
+            csmartcols.scols_column_set_cmpfunc(self._c_column, csmartcols.scols_cmpstr_cells, NULL)
+        else:
+            self._cmp_payload = <CmpPayload *>malloc(sizeof(CmpPayload))
+            if not self._cmp_payload:
+                raise MemoryError()
+            self._cmp_payload.data = <void *>data
+            self._cmp_payload.func = <void *>func
+            csmartcols.scols_column_set_cmpfunc(self._c_column, cmpfunc_wrapper, <void *>self._cmp_payload)
 
     cdef set_flag(self, int flag, bint v):
         cdef int flags = csmartcols.scols_column_get_flags(self._c_column)
@@ -385,6 +442,9 @@ cdef class Table:
     def __dealloc__(self):
         if self._c_table is not NULL:
             csmartcols.scols_unref_table(self._c_table)
+
+    def sort(self, Column column not None):
+        csmartcols.scols_sort_table(self._c_table, column._c_column)
 
     def __str__(self):
         """

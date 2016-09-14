@@ -1,6 +1,13 @@
 cdef extern from "libsmartcols.h":
     void                scols_init_debug                  (int                  mask)
 
+    ctypedef int        (*cmpfunc)                        (libscols_cell       *a,
+                                                           libscols_cell       *b,
+                                                           void                *data)
+    int                 scols_cmpstr_cells                (libscols_cell       *a,
+                                                           libscols_cell       *b,
+                                                           void                *data)
+
     cdef enum:
         SCOLS_CELL_FL_LEFT
         SCOLS_CELL_FL_CENTER
@@ -30,6 +37,9 @@ cdef extern from "libsmartcols.h":
         pass
     libscols_column    *scols_new_column                  ()
     void                scols_unref_column                (libscols_column     *column)
+    int                 scols_column_set_cmpfunc          (libscols_column     *column,
+                                                           cmpfunc              func,
+                                                           void                *data)
     int                 scols_column_get_flags            (libscols_column     *column)
     int                 scols_column_set_flags            (libscols_column     *column,
                                                            int                  flags)
@@ -83,6 +93,8 @@ cdef extern from "libsmartcols.h":
         pass
     libscols_table     *scols_new_table                   ()
     void                scols_unref_table                 (libscols_table      *table)
+    int                 scols_sort_table                  (libscols_table      *table,
+                                                           libscols_column     *column)
     int                 scols_print_table_to_string       (libscols_table      *table,
                                                            char               **data)
     int                 scols_table_enable_nolinesep      (libscols_table      *table,

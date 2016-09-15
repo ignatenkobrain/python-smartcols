@@ -8,11 +8,11 @@ cdef extern from "libsmartcols.h":
                                                            libscols_cell       *b,
                                                            void                *data)
 
-    cdef enum:
+    enum:
         SCOLS_CELL_FL_LEFT
         SCOLS_CELL_FL_CENTER
         SCOLS_CELL_FL_RIGHT
-    cdef struct libscols_cell:
+    struct libscols_cell:
         pass
     const char         *scols_cell_get_data               (const libscols_cell *cell)
     int                 scols_cell_set_data               (libscols_cell       *cell,
@@ -24,7 +24,7 @@ cdef extern from "libsmartcols.h":
     int                 scols_cell_set_flags              (libscols_cell       *cell,
                                                            int                  flags)
 
-    cdef enum:
+    enum:
         SCOLS_FL_TRUNC
         SCOLS_FL_TREE
         SCOLS_FL_RIGHT
@@ -33,7 +33,7 @@ cdef extern from "libsmartcols.h":
         SCOLS_FL_HIDDEN
         SCOLS_FL_WRAP
         SCOLS_FL_WRAPNL
-    cdef struct libscols_column:
+    struct libscols_column:
         pass
     libscols_column    *scols_new_column                  ()
     void                scols_unref_column                (libscols_column     *column)
@@ -59,7 +59,7 @@ cdef extern from "libsmartcols.h":
     int                 scols_column_set_whint            (libscols_column     *column,
                                                            double               whint)
 
-    cdef struct libscols_line:
+    struct libscols_line:
         pass
     libscols_line      *scols_new_line                    ()
     void                scols_unref_line                  (libscols_line       *line)
@@ -74,7 +74,7 @@ cdef extern from "libsmartcols.h":
     int                 scols_line_set_color              (libscols_line       *line,
                                                            const char          *color)
 
-    cdef struct libscols_symbols:
+    struct libscols_symbols:
         pass
     libscols_symbols   *scols_new_symbols                 ()
     void                scols_unref_symbols               (libscols_symbols    *symbols)
@@ -89,7 +89,7 @@ cdef extern from "libsmartcols.h":
     int                 scols_symbols_set_cell_padding    (libscols_symbols    *symbols,
                                                            const char          *s)
 
-    cdef struct libscols_table:
+    struct libscols_table:
         pass
     libscols_table     *scols_new_table                   ()
     void                scols_unref_table                 (libscols_table      *table)
@@ -134,7 +134,7 @@ cdef extern from "libsmartcols.h":
                                                            const char          *separator)
     libscols_cell      *scols_table_get_title             (libscols_table      *table)
 
-    cdef enum:
+    enum:
         SCOLS_TERMFORCE_AUTO
         SCOLS_TERMFORCE_NEVER
         SCOLS_TERMFORCE_ALWAYS

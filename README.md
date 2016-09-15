@@ -1,19 +1,21 @@
 python-smartcols
 ================
 
-Python bindings for util-linux libsmartcols-library
+Python bindings for util-linux libsmartcols-library.
 
 Building
 --------
 
 ```
-$ python setup.py build_ext --inplace
+$ python setup.py build
 ```
 
 Running tests
 -------------
 
 ```
+$ git submodule init
+$ git submodule update
 $ python setup.py test
 ```
 
@@ -21,15 +23,14 @@ Running tests with coverage
 ---------------------------
 
 ```
-$ PYTHONPATH=. coverage run tests.py
-$ coverage html
+$ py.test --cov --cov-report=html
 ```
 
 Building documentation
 ----------------------
 
 ```
-$ PYTHONPATH=. python setup.py build_sphinx
+$ python setup.py build_sphinx
 ```
 
 HTML documentation will be available in `doc/_build/html/`

@@ -1,13 +1,27 @@
-from __future__ import print_function, unicode_literals
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
+
+import argparse
 import locale
+import os
+import sys
 
 import smartcols
 
-if __name__ == "__main__":
-    locale.setlocale(locale.LC_ALL, "")
+def main(args=None):
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-m", "--maxout", action="store_true")
+    parser.add_argument("-w", "--width", type=int)
+    args = parser.parse_args(args)
 
     tb = smartcols.Table()
-    tb.colors = True
+    tb.colors = os.isatty(sys.stdout.fileno())
+    if args.maxout:
+        tb.maxout = args.maxout
+    if args.width:
+        tb.termforce = "always"
+        tb.termwidth = args.width
 
     cl_name = tb.new_column("NAME")
     cl_data = tb.new_column("DATA")
@@ -16,6 +30,7 @@ if __name__ == "__main__":
         ln = tb.new_line()
         ln[cl_name] = name
         ln[cl_data] = data
+        return ln
 
     add_line("foo", "bla bla bla")
     add_line("bar", "alb alb alb")
@@ -42,3 +57,8 @@ if __name__ == "__main__":
     title.color = "blue"
     title.position = "left"
     print(tb)
+
+if __name__ == "__main__":
+    locale.setlocale(locale.LC_ALL, "")
+    smartcols.init_debug()
+    main()

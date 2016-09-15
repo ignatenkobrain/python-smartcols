@@ -2,6 +2,7 @@
 
 import os
 import subprocess
+import sys
 
 from Cython.Build import cythonize
 from setuptools import setup, Extension
@@ -31,6 +32,9 @@ if DEBUG:
     flags["define_macros"] = [("CYTHON_TRACE", 1)]
 extensions = [Extension("smartcols", ["smartcols.pyx"], **flags)]
 
+needs_pytest = {"pytest", "test", "ptr"}.intersection(sys.argv)
+pytest_runner = ["pytest-runner"] if needs_pytest else []
+
 setup(
     name="smartcols",
     version=VERSION,
@@ -56,5 +60,6 @@ setup(
     url="https://github.com/ignatenkobrain/python-smartcols",
     download_url="https://github.com/ignatenkobrain/python-smartcols/archive/v{}.tar.gz".format(VERSION),
     ext_modules=cythonize(extensions, gdb_debug=DEBUG),
-    test_suite="tests",
+    setup_requires=["Cython", "pytest-runner"],
+    tests_require=["pytest>=2.8"],
 )

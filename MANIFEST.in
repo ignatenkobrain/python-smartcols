@@ -1,4 +1,4 @@
 include COPYING
 include csmartcols.pxd
 include smartcols.pyx
-recursive-include tests *.txt *.py
+recursive-include tests *.py

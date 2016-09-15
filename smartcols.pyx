@@ -619,10 +619,9 @@ cdef class Table:
         def __get__(self):
             cdef const char *sep = csmartcols.scols_table_get_column_separator(self._c_table)
             return sep if sep is not NULL else None
-        def __set__(self, separator):
-            csmartcols.scols_table_set_column_separator(self._c_table, separator)
+        def __set__(self, basestring separator):
             if separator is not None:
-                csmartcols.scols_table_set_column_separator(self._c_table, separator)
+                csmartcols.scols_table_set_column_separator(self._c_table, separator.encode("UTF-8"))
             else:
                 csmartcols.scols_table_set_column_separator(self._c_table, NULL)
 
@@ -633,10 +632,9 @@ cdef class Table:
         def __get__(self):
             cdef const char *sep = csmartcols.scols_table_get_line_separator(self._c_table)
             return sep if sep is not NULL else None
-        def __set__(self, separator):
-            csmartcols.scols_table_set_line_separator(self._c_table, separator)
+        def __set__(self, basestring separator):
             if separator is not None:
-                csmartcols.scols_table_set_line_separator(self._c_table, separator)
+                csmartcols.scols_table_set_line_separator(self._c_table, separator.encode("UTF-8"))
             else:
                 csmartcols.scols_table_set_line_separator(self._c_table, NULL)
 

@@ -19,6 +19,7 @@
 
 from libc.stdlib cimport malloc, free
 from libc.string cimport strcmp
+from cpython cimport Py_INCREF
 from csmartcols cimport *
 
 from warnings import warn
@@ -320,6 +321,8 @@ cdef class Line:
             raise MemoryError()
         if parent is not None:
             scols_line_add_child(parent._c_line, self._c_line)
+            Py_INCREF(self)
+            Py_INCREF(parent)
     def __dealloc__(self):
         if self._c_line is not NULL:
             scols_unref_line(self._c_line)
@@ -455,6 +458,7 @@ cdef class Table:
     """
 
     cdef libscols_table *_c_table
+    cdef Symbols _symbols
 
     def __cinit__(self):
         self._c_table = scols_new_table()
@@ -523,6 +527,7 @@ cdef class Table:
         :type column: smartcols.Column
         """
         scols_table_add_column(self._c_table, column._c_column)
+        Py_INCREF(column)
     def new_column(self, *args, **kwargs):
         """
         new_column(self, *args, **kwargs)
@@ -547,6 +552,7 @@ cdef class Table:
         :type line: smartcols.Line
         """
         scols_table_add_line(self._c_table, line._c_line)
+        Py_INCREF(line)
     def new_line(self, *args, **kwargs):
         """
         new_line(self, *args, **kwargs)
@@ -605,11 +611,14 @@ cdef class Table:
         """
         Used symbols. See :class:`smartcols.Symbols`.
         """
+        def __get__(self):
+            return self._symbols
         def __set__(self, Symbols symbols):
             if symbols is not None:
                 scols_table_set_symbols(self._c_table, symbols._c_symbols)
             else:
                 scols_table_set_symbols(self._c_table, NULL)
+            self._symbols = symbols
 
     property column_separator:
         """

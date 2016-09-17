@@ -19,10 +19,9 @@
 
 from libc.stdlib cimport malloc, free
 from libc.string cimport strcmp
+from csmartcols cimport *
 
 from warnings import warn
-
-cimport csmartcols
 
 cdef bint DEBUG_INITIALIZED = False
 
@@ -41,7 +40,7 @@ cpdef void init_debug(int mask=0):
         warn("Calling smartcols.init_debug() multiple times has no effect. "
              "First call initializes debugging features.", RuntimeWarning)
     else:
-        csmartcols.scols_init_debug(mask)
+        scols_init_debug(mask)
         DEBUG_INITIALIZED = True
 
 cdef struct CmpPayload:
@@ -66,12 +65,12 @@ cpdef int cmpfunc_strcmp(basestring s1, basestring s2, object data=None):
         return 1
     return strcmp(s1.encode("UTF-8"), s2.encode("UTF-8"))
 
-cdef int cmpfunc_wrapper(csmartcols.libscols_cell *a, csmartcols.libscols_cell *b, void *data):
+cdef int cmpfunc_wrapper(libscols_cell *a, libscols_cell *b, void *data):
     if a == b:
         return 0
 
-    cdef const char *adata = csmartcols.scols_cell_get_data(a)
-    cdef const char *bdata = csmartcols.scols_cell_get_data(b)
+    cdef const char *adata = scols_cell_get_data(a)
+    cdef const char *bdata = scols_cell_get_data(b)
     cdef CmpPayload *payload = <CmpPayload *>data
 
     return (<object>payload.func)(adata, bdata, <object>payload.data)
@@ -84,38 +83,38 @@ cdef class Cell:
     :class:`smartcols.Line`.
     """
 
-    cdef csmartcols.libscols_cell *_c_cell
+    cdef libscols_cell *_c_cell
 
     property data:
         """
         Text in cell.
         """
         def __get__(self):
-            cdef const char *d = csmartcols.scols_cell_get_data(self._c_cell)
+            cdef const char *d = scols_cell_get_data(self._c_cell)
             return d if d is not NULL else None
         def __set__(self, basestring data):
             if data is not None:
-                csmartcols.scols_cell_set_data(self._c_cell, data.encode("UTF-8"))
+                scols_cell_set_data(self._c_cell, data.encode("UTF-8"))
             else:
-                csmartcols.scols_cell_set_data(self._c_cell, NULL)
+                scols_cell_set_data(self._c_cell, NULL)
 
     property color:
         """
         Color for text in cell.
         """
         def __get__(self):
-            cdef const char *c = csmartcols.scols_cell_get_color(self._c_cell)
+            cdef const char *c = scols_cell_get_color(self._c_cell)
             return c if c is not NULL else None
         def __set__(self, basestring color):
             if color is not None:
-                csmartcols.scols_cell_set_color(self._c_cell, color.encode("UTF-8"))
+                scols_cell_set_color(self._c_cell, color.encode("UTF-8"))
             else:
-                csmartcols.scols_cell_set_color(self._c_cell, NULL)
+                scols_cell_set_color(self._c_cell, NULL)
 
 cdef dict TitlePosition = {
-    "left": csmartcols.SCOLS_CELL_FL_LEFT,
-    "center": csmartcols.SCOLS_CELL_FL_CENTER,
-    "right": csmartcols.SCOLS_CELL_FL_RIGHT}
+    "left": SCOLS_CELL_FL_LEFT,
+    "center": SCOLS_CELL_FL_CENTER,
+    "right": SCOLS_CELL_FL_RIGHT}
 
 cdef class Title(Cell):
     """
@@ -127,10 +126,10 @@ cdef class Title(Cell):
         Position. One of `left`, `center` or `right`.
         """
         def __get__(self):
-            cdef int pos = csmartcols.scols_cell_get_flags(self._c_cell)
+            cdef int pos = scols_cell_get_flags(self._c_cell)
             return next(k for k, v in TitlePosition.items() if v == pos)
         def __set__(self, basestring position not None):
-            csmartcols.scols_cell_set_flags(self._c_cell, TitlePosition[position])
+            scols_cell_set_flags(self._c_cell, TitlePosition[position])
 
 cdef class Column:
     """
@@ -141,18 +140,18 @@ cdef class Column:
     :type name: str
     """
 
-    cdef csmartcols.libscols_column *_c_column
+    cdef libscols_column *_c_column
     cdef CmpPayload *_cmp_payload
 
     def __cinit__(self, basestring name=None):
-        self._c_column = csmartcols.scols_new_column()
+        self._c_column = scols_new_column()
         if self._c_column is NULL:
             raise MemoryError()
         if name is not None:
             self.name = name
     def __dealloc__(self):
         if self._c_column is not NULL:
-            csmartcols.scols_unref_column(self._c_column)
+            scols_unref_column(self._c_column)
         if self._cmp_payload is not NULL:
             free(self._cmp_payload)
 
@@ -168,91 +167,91 @@ cdef class Column:
         if self._cmp_payload is not NULL:
             free(self._cmp_payload)
         if func == cmpfunc_strcmp:
-            csmartcols.scols_column_set_cmpfunc(self._c_column, csmartcols.scols_cmpstr_cells, NULL)
+            scols_column_set_cmpfunc(self._c_column, scols_cmpstr_cells, NULL)
         else:
             self._cmp_payload = <CmpPayload *>malloc(sizeof(CmpPayload))
             if not self._cmp_payload:
                 raise MemoryError()
             self._cmp_payload.data = <void *>data
             self._cmp_payload.func = <void *>func
-            csmartcols.scols_column_set_cmpfunc(self._c_column, cmpfunc_wrapper, <void *>self._cmp_payload)
+            scols_column_set_cmpfunc(self._c_column, cmpfunc_wrapper, <void *>self._cmp_payload)
 
     cdef set_flag(self, int flag, bint v):
-        cdef int flags = csmartcols.scols_column_get_flags(self._c_column)
+        cdef int flags = scols_column_get_flags(self._c_column)
         cdef bint current = flags & flag
         if not current and v:
-            csmartcols.scols_column_set_flags(self._c_column, flags | flag)
+            scols_column_set_flags(self._c_column, flags | flag)
         elif current and not v:
-            csmartcols.scols_column_set_flags(self._c_column, flags ^ flag)
+            scols_column_set_flags(self._c_column, flags ^ flag)
 
     property trunc:
         """
         Truncate text in cells if necessary.
         """
         def __get__(self):
-            return csmartcols.scols_column_is_trunc(self._c_column)
+            return scols_column_is_trunc(self._c_column)
         def __set__(self, bint value):
-            self.set_flag(csmartcols.SCOLS_FL_TRUNC, value)
+            self.set_flag(SCOLS_FL_TRUNC, value)
 
     property tree:
         """
         Use tree "ASCII Art".
         """
         def __get__(self):
-            return csmartcols.scols_column_is_tree(self._c_column)
+            return scols_column_is_tree(self._c_column)
         def __set__(self, bint value):
-            self.set_flag(csmartcols.SCOLS_FL_TREE, value)
+            self.set_flag(SCOLS_FL_TREE, value)
 
     property right:
         """
         Align text in cells to the right.
         """
         def __get__(self):
-            return csmartcols.scols_column_is_right(self._c_column)
+            return scols_column_is_right(self._c_column)
         def __set__(self, bint value):
-            self.set_flag(csmartcols.SCOLS_FL_RIGHT, value)
+            self.set_flag(SCOLS_FL_RIGHT, value)
 
     property strict_width:
         """
         Do not reduce width if column is empty.
         """
         def __get__(self):
-            return csmartcols.scols_column_is_strict_width(self._c_column)
+            return scols_column_is_strict_width(self._c_column)
         def __set__(self, bint value):
-            self.set_flag(csmartcols.SCOLS_FL_STRICTWIDTH, value)
+            self.set_flag(SCOLS_FL_STRICTWIDTH, value)
 
     property noextremes:
         def __get__(self):
-            return csmartcols.scols_column_is_noextremes(self._c_column)
+            return scols_column_is_noextremes(self._c_column)
         def __set__(self, bint value):
-            self.set_flag(csmartcols.SCOLS_FL_NOEXTREMES, value)
+            self.set_flag(SCOLS_FL_NOEXTREMES, value)
 
     property hidden:
         """
         Make column hidden for user.
         """
         def __get__(self):
-            return csmartcols.scols_column_is_hidden(self._c_column)
+            return scols_column_is_hidden(self._c_column)
         def __set__(self, bint value):
-            self.set_flag(csmartcols.SCOLS_FL_HIDDEN, value)
+            self.set_flag(SCOLS_FL_HIDDEN, value)
 
     property wrap:
         """
         Wrap long lines to multi-line cells.
         """
         def __get__(self):
-            return csmartcols.scols_column_is_wrap(self._c_column)
+            return scols_column_is_wrap(self._c_column)
         def __set__(self, bint value):
-            self.set_flag(csmartcols.SCOLS_FL_WRAP, value)
+            self.set_flag(SCOLS_FL_WRAP, value)
 
     property wrapnl:
         """
         Wrap long lines to multi-line cells based on newline (``\n``).
         """
         def __get__(self):
-            return csmartcols.scols_column_is_wrapnl(self._c_column)
+            return scols_column_is_wrapnl(self._c_column)
         def __set__(self, bint value):
-            self.set_flag(csmartcols.SCOLS_FL_WRAPNL, value)
+            self.set_flag(SCOLS_FL_WRAPNL, value)
 
     property name:
         """
@@ -260,11 +259,11 @@ cdef class Column:
         """
         def __get__(self):
             cdef Cell cell = Cell()
-            cell._c_cell = csmartcols.scols_column_get_header(self._c_column)
+            cell._c_cell = scols_column_get_header(self._c_column)
             return cell.data
         def __set__(self, basestring name):
             cdef Cell cell = Cell()
-            cell._c_cell = csmartcols.scols_column_get_header(self._c_column)
+            cell._c_cell = scols_column_get_header(self._c_column)
             cell.data = name
 
     property color:
@@ -272,22 +271,22 @@ cdef class Column:
         The default color for data cells in column and column header.
         """
         def __get__(self):
-            cdef const char *c = csmartcols.scols_column_get_color(self._c_column)
+            cdef const char *c = scols_column_get_color(self._c_column)
             return c if c is not NULL else None
         def __set__(self, basestring color):
             if color is not None:
-                csmartcols.scols_column_set_color(self._c_column, color.encode("UTF-8"))
+                scols_column_set_color(self._c_column, color.encode("UTF-8"))
             else:
-                csmartcols.scols_column_set_color(self._c_column, NULL)
+                scols_column_set_color(self._c_column, NULL)
 
     property whint:
         """
         Width hint of column.
         """
         def __get__(self):
-            return csmartcols.scols_column_get_whint(self._c_column)
+            return scols_column_get_whint(self._c_column)
         def __set__(self, double whint):
-            csmartcols.scols_column_set_whint(self._c_column, whint)
+            scols_column_set_whint(self._c_column, whint)
 
 cdef class Line:
     """
@@ -313,37 +312,37 @@ cdef class Line:
         >>> line[column] = "bar"
     """
 
-    cdef csmartcols.libscols_line *_c_line
+    cdef libscols_line *_c_line
 
     def __cinit__(self, Line parent=None):
-        self._c_line = csmartcols.scols_new_line()
+        self._c_line = scols_new_line()
         if self._c_line is NULL:
             raise MemoryError()
         if parent is not None:
-            csmartcols.scols_line_add_child(parent._c_line, self._c_line)
+            scols_line_add_child(parent._c_line, self._c_line)
     def __dealloc__(self):
         if self._c_line is not NULL:
-            csmartcols.scols_unref_line(self._c_line)
+            scols_unref_line(self._c_line)
 
     def __getitem__(self, Column column not None):
         cdef Cell cell = Cell()
-        cell._c_cell = csmartcols.scols_line_get_column_cell(self._c_line, column._c_column)
+        cell._c_cell = scols_line_get_column_cell(self._c_line, column._c_column)
         return cell
     def __setitem__(self, Column column not None, basestring data):
-        csmartcols.scols_line_set_column_data(self._c_line, column._c_column, data.encode("UTF-8"))
+        scols_line_set_column_data(self._c_line, column._c_column, data.encode("UTF-8"))
 
     property color:
         """
         The color for data cells in line.
         """
         def __get__(self):
-            cdef const char *c = csmartcols.scols_line_get_color(self._c_line)
+            cdef const char *c = scols_line_get_color(self._c_line)
             return c if c is not NULL else None
         def __set__(self, basestring color):
             if color is not None:
-                csmartcols.scols_line_set_color(self._c_line, color.encode("UTF-8"))
+                scols_line_set_color(self._c_line, color.encode("UTF-8"))
             else:
-                csmartcols.scols_line_set_color(self._c_line, NULL)
+                scols_line_set_color(self._c_line, NULL)
 
 cdef class Symbols:
     """
@@ -351,7 +350,7 @@ cdef class Symbols:
     Symbols.
     """
 
-    cdef csmartcols.libscols_symbols *_c_symbols
+    cdef libscols_symbols *_c_symbols
     cdef basestring __branch
     cdef basestring __right
     cdef basestring __vertical
@@ -359,12 +358,12 @@ cdef class Symbols:
     cdef basestring __cell_padding
 
     def __cinit__(self):
-        self._c_symbols = csmartcols.scols_new_symbols()
+        self._c_symbols = scols_new_symbols()
         if self._c_symbols is NULL:
             raise MemoryError()
     def __dealloc__(self):
         if self._c_symbols is not NULL:
-            csmartcols.scols_unref_symbols(self._c_symbols)
+            scols_unref_symbols(self._c_symbols)
 
     property branch:
         """
@@ -374,9 +373,9 @@ cdef class Symbols:
             return self.__branch
         def __set__(self, basestring value):
             if value is not None:
-                csmartcols.scols_symbols_set_branch(self._c_symbols, value.encode("UTF-8"))
+                scols_symbols_set_branch(self._c_symbols, value.encode("UTF-8"))
             else:
-                csmartcols.scols_symbols_set_branch(self._c_symbols, NULL)
+                scols_symbols_set_branch(self._c_symbols, NULL)
             self.__branch = value
 
     property right:
@@ -387,9 +386,9 @@ cdef class Symbols:
             return self.__right
         def __set__(self, basestring value):
             if value is not None:
-                csmartcols.scols_symbols_set_right(self._c_symbols, value.encode("UTF-8"))
+                scols_symbols_set_right(self._c_symbols, value.encode("UTF-8"))
             else:
-                csmartcols.scols_symbols_set_right(self._c_symbols, NULL)
+                scols_symbols_set_right(self._c_symbols, NULL)
             self.__right = value
 
     property vertical:
@@ -400,9 +399,9 @@ cdef class Symbols:
             return self.__vertical
         def __set__(self, basestring value):
             if value is not None:
-                csmartcols.scols_symbols_set_vertical(self._c_symbols, value.encode("UTF-8"))
+                scols_symbols_set_vertical(self._c_symbols, value.encode("UTF-8"))
             else:
-                csmartcols.scols_symbols_set_vertical(self._c_symbols, NULL)
+                scols_symbols_set_vertical(self._c_symbols, NULL)
             self.__vertical = value
 
     property title_padding:
@@ -413,9 +412,9 @@ cdef class Symbols:
             return self.__title_padding
         def __set__(self, basestring value):
             if value is not None:
-                csmartcols.scols_symbols_set_title_padding(self._c_symbols, value.encode("UTF-8"))
+                scols_symbols_set_title_padding(self._c_symbols, value.encode("UTF-8"))
             else:
-                csmartcols.scols_symbols_set_title_padding(self._c_symbols, NULL)
+                scols_symbols_set_title_padding(self._c_symbols, NULL)
             self.__title_padding = value
 
     property cell_padding:
@@ -426,15 +425,15 @@ cdef class Symbols:
             return self.__cell_padding
         def __set__(self, basestring value):
             if value is not None:
-                csmartcols.scols_symbols_set_cell_padding(self._c_symbols, value.encode("UTF-8"))
+                scols_symbols_set_cell_padding(self._c_symbols, value.encode("UTF-8"))
             else:
-                csmartcols.scols_symbols_set_cell_padding(self._c_symbols, NULL)
+                scols_symbols_set_cell_padding(self._c_symbols, NULL)
             self.__cell_padding = value
 
 cdef dict TableTermForce = {
-    "auto": csmartcols.SCOLS_TERMFORCE_AUTO,
-    "never": csmartcols.SCOLS_TERMFORCE_NEVER,
-    "always": csmartcols.SCOLS_TERMFORCE_ALWAYS}
+    "auto": SCOLS_TERMFORCE_AUTO,
+    "never": SCOLS_TERMFORCE_NEVER,
+    "always": SCOLS_TERMFORCE_ALWAYS}
 
 cdef class Table:
     """
@@ -455,18 +454,18 @@ cdef class Table:
         Igor Gnatenko  18
     """
 
-    cdef csmartcols.libscols_table *_c_table
+    cdef libscols_table *_c_table
 
     def __cinit__(self):
-        self._c_table = csmartcols.scols_new_table()
+        self._c_table = scols_new_table()
         if self._c_table is NULL:
             raise MemoryError()
     def __dealloc__(self):
         if self._c_table is not NULL:
-            csmartcols.scols_unref_table(self._c_table)
+            scols_unref_table(self._c_table)
 
     def sort(self, Column column not None):
-        csmartcols.scols_sort_table(self._c_table, column._c_column)
+        scols_sort_table(self._c_table, column._c_column)
 
     def __str__(self):
         """
@@ -477,7 +476,7 @@ cdef class Table:
         :rtype: string
         """
         cdef char *data = NULL
-        csmartcols.scols_print_table_to_string(self._c_table, &data)
+        scols_print_table_to_string(self._c_table, &data)
         cdef str ret = data
         free(data)
         return ret
@@ -495,9 +494,9 @@ cdef class Table:
         :rtype: str
         """
         cdef char *data = NULL
-        csmartcols.scols_table_enable_nolinesep(self._c_table, True)
-        csmartcols.scols_table_print_range_to_string(self._c_table, start._c_line if start is not None else NULL, end._c_line if end is not None else NULL, &data)
-        csmartcols.scols_table_enable_nolinesep(self._c_table, False)
+        scols_table_enable_nolinesep(self._c_table, True)
+        scols_table_print_range_to_string(self._c_table, start._c_line if start is not None else NULL, end._c_line if end is not None else NULL, &data)
+        scols_table_enable_nolinesep(self._c_table, False)
         cdef str ret = data
         free(data)
         return ret
@@ -509,10 +508,10 @@ cdef class Table:
         :return: JSON dictionary
         :rtype: dict
         """
-        csmartcols.scols_table_enable_json(self._c_table, True)
+        scols_table_enable_json(self._c_table, True)
         from json import loads
         cdef dict ret = loads(self.__str__())
-        csmartcols.scols_table_enable_json(self._c_table, False)
+        scols_table_enable_json(self._c_table, False)
         return ret
 
     def add_column(self, Column column not None):
@@ -523,7 +522,7 @@ cdef class Table:
         :param column: Column
         :type column: smartcols.Column
         """
-        csmartcols.scols_table_add_column(self._c_table, column._c_column)
+        scols_table_add_column(self._c_table, column._c_column)
     def new_column(self, *args, **kwargs):
         """
         new_column(self, *args, **kwargs)
@@ -547,7 +546,7 @@ cdef class Table:
         :param line: Line
         :type line: smartcols.Line
         """
-        csmartcols.scols_table_add_line(self._c_table, line._c_line)
+        scols_table_add_line(self._c_table, line._c_line)
     def new_line(self, *args, **kwargs):
         """
         new_line(self, *args, **kwargs)
@@ -569,18 +568,18 @@ cdef class Table:
         with :attr:`smartcols.Column.tree` activated.
         """
         def __get__(self):
-            return csmartcols.scols_table_is_ascii(self._c_table)
+            return scols_table_is_ascii(self._c_table)
         def __set__(self, bint value):
-            csmartcols.scols_table_enable_ascii(self._c_table, value)
+            scols_table_enable_ascii(self._c_table, value)
 
     property colors:
         """
         Enable/Disable colors.
         """
         def __get__(self):
-            return csmartcols.scols_table_colors_wanted(self._c_table)
+            return scols_table_colors_wanted(self._c_table)
         def __set__(self, bint value):
-            csmartcols.scols_table_enable_colors(self._c_table, value)
+            scols_table_enable_colors(self._c_table, value)
 
     property maxout:
         """
@@ -589,18 +588,18 @@ cdef class Table:
         full width of terminal.
         """
         def __get__(self):
-            return csmartcols.scols_table_is_maxout(self._c_table)
+            return scols_table_is_maxout(self._c_table)
         def __set__(self, bint value):
-            csmartcols.scols_table_enable_maxout(self._c_table, value)
+            scols_table_enable_maxout(self._c_table, value)
 
     property noheadings:
         """
         Do not print header.
         """
         def __get__(self):
-            return csmartcols.scols_table_is_noheadings(self._c_table)
+            return scols_table_is_noheadings(self._c_table)
         def __set__(self, bint value):
-            csmartcols.scols_table_enable_noheadings(self._c_table, value)
+            scols_table_enable_noheadings(self._c_table, value)
 
     property symbols:
         """
@@ -608,35 +607,35 @@ cdef class Table:
         """
         def __set__(self, Symbols symbols):
             if symbols is not None:
-                csmartcols.scols_table_set_symbols(self._c_table, symbols._c_symbols)
+                scols_table_set_symbols(self._c_table, symbols._c_symbols)
             else:
-                csmartcols.scols_table_set_symbols(self._c_table, NULL)
+                scols_table_set_symbols(self._c_table, NULL)
 
     property column_separator:
         """
         Column separator.
         """
         def __get__(self):
-            cdef const char *sep = csmartcols.scols_table_get_column_separator(self._c_table)
+            cdef const char *sep = scols_table_get_column_separator(self._c_table)
             return sep if sep is not NULL else None
         def __set__(self, basestring separator):
             if separator is not None:
-                csmartcols.scols_table_set_column_separator(self._c_table, separator.encode("UTF-8"))
+                scols_table_set_column_separator(self._c_table, separator.encode("UTF-8"))
             else:
-                csmartcols.scols_table_set_column_separator(self._c_table, NULL)
+                scols_table_set_column_separator(self._c_table, NULL)
 
     property line_separator:
         """
         Line separator.
         """
         def __get__(self):
-            cdef const char *sep = csmartcols.scols_table_get_line_separator(self._c_table)
+            cdef const char *sep = scols_table_get_line_separator(self._c_table)
             return sep if sep is not NULL else None
         def __set__(self, basestring separator):
             if separator is not None:
-                csmartcols.scols_table_set_line_separator(self._c_table, separator.encode("UTF-8"))
+                scols_table_set_line_separator(self._c_table, separator.encode("UTF-8"))
             else:
-                csmartcols.scols_table_set_line_separator(self._c_table, NULL)
+                scols_table_set_line_separator(self._c_table, NULL)
 
     property title:
         """
@@ -644,7 +643,7 @@ cdef class Table:
         """
         def __get__(self):
             cdef Title title = Title()
-            title._c_cell = csmartcols.scols_table_get_title(self._c_table)
+            title._c_cell = scols_table_get_title(self._c_table)
             return title
         def __set__(self, basestring title):
             self.title.data = title
@@ -654,10 +653,10 @@ cdef class Table:
         Force terminal output. One of `auto`, `never`, `always`.
         """
         def __get__(self):
-            cdef int force = csmartcols.scols_table_get_termforce(self._c_table)
+            cdef int force = scols_table_get_termforce(self._c_table)
             return next(k for k, v in TableTermForce.items() if v == force)
         def __set__(self, basestring force not None):
-            csmartcols.scols_table_set_termforce(self._c_table, TableTermForce[force])
+            scols_table_set_termforce(self._c_table, TableTermForce[force])
 
     property termwidth:
         """
@@ -665,6 +664,6 @@ cdef class Table:
         failure it uses 80 characters. You can override terminal width here.
         """
         def __get__(self):
-            return csmartcols.scols_table_get_termwidth(self._c_table)
+            return scols_table_get_termwidth(self._c_table)
         def __set__(self, size_t width):
-            csmartcols.scols_table_set_termwidth(self._c_table, width)
+            scols_table_set_termwidth(self._c_table, width)

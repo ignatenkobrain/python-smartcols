@@ -21,12 +21,14 @@ from libc.stdlib cimport malloc, free
 from libc.string cimport strcmp
 from libc.stdint cimport uintptr_t
 from cython cimport internal
-from cpython cimport Py_INCREF
 from csmartcols cimport *
 
 from warnings import warn
 import weakref
 
+# scols_* returns pointers to struct, we need to have way to return Python
+# class instead, so we will store uintptr_t->object here. Always we should
+# have our object here, if not there is a bug in our code.
 cdef object __refs__ = weakref.WeakValueDictionary()
 cdef bint DEBUG_INITIALIZED = False
 
@@ -100,7 +102,15 @@ cdef class Cell:
     :class:`smartcols.Line`.
     """
 
+    cdef object __weakref__
     cdef libscols_cell *_c_cell
+
+    @staticmethod
+    cdef Cell new(libscols_cell *cell):
+        ce = Cell()
+        ce._c_cell = cell
+        __refs__[<uintptr_t>ce._c_cell] = ce
+        return ce
 
     property data:
         """
@@ -138,6 +148,13 @@ cdef class Title(Cell):
     Title.
     """
 
+    @staticmethod
+    cdef Title new(libscols_cell *cell):
+        ce = Title()
+        ce._c_cell = cell
+        __refs__[<uintptr_t>ce._c_cell] = ce
+        return ce
+
     property position:
         """
         Position. One of `left`, `center` or `right`.
@@ -159,6 +176,7 @@ cdef class Column:
 
     cdef object __weakref__
     cdef libscols_column *_c_column
+    cdef Cell _header
     cdef CmpPayload *_cmp_payload
 
     def __cinit__(self, basestring name=None):
@@ -166,13 +184,36 @@ cdef class Column:
         if self._c_column is NULL:
             raise MemoryError()
         __refs__[<uintptr_t>self._c_column] = self
+        self._header = Cell.new(scols_column_get_header(self._c_column))
         if name is not None:
             self.name = name
     def __dealloc__(self):
-        if self._c_column is not NULL:
-            scols_unref_column(self._c_column)
-        if self._cmp_payload is not NULL:
-            free(self._cmp_payload)
+        scols_unref_column(self._c_column)
+        free(self._cmp_payload)
+
+    property header:
+        """
+        The header of column. Used in table's header.
+
+        :getter: Returns header
+        :type: weakproxy(smartcols.Cell)
+        """
+        def __get__(self):
+            return weakref.proxy(self._header)
+
+    property name:
+        """
+        The title of column. Shortcut for getting/setting data for
+        :attr:`smartcols.Column.header`.
+
+        :getter: Returns title
+        :setter: Sets title
+        :type: str
+        """
+        def __get__(self):
+            return self._header.data
+        def __set__(self, basestring name):
+            self._header.data = name
 
     def set_cmpfunc(self, object func not None, object data=None):
         """
@@ -272,19 +313,6 @@ cdef class Column:
         def __set__(self, bint value):
             self.set_flag(SCOLS_FL_WRAPNL, value)
 
-    property name:
-        """
-        The title of column. Used in table's header.
-        """
-        def __get__(self):
-            cdef Cell cell = Cell()
-            cell._c_cell = scols_column_get_header(self._c_column)
-            return cell.data
-        def __set__(self, basestring name):
-            cdef Cell cell = Cell()
-            cell._c_cell = scols_column_get_header(self._c_column)
-            cell.data = name
-
     property color:
         """
         The default color for data cells in column and column header.
@@ -333,26 +361,43 @@ cdef class Line:
 
     cdef object __weakref__
     cdef libscols_line *_c_line
+    # Cells are automatically allocated by libsmartcols, but we want to return
+    # Python objects, so we will create cells as libsmartcols does internally
+    # and put them into set, once cell is removed in libsmartcols, we will
+    # drop it as well.
+    cdef set __cells__
+    cdef set __childs__
+    cdef Line _parent
 
     def __cinit__(self, Line parent=None):
         self._c_line = scols_new_line()
         if self._c_line is NULL:
             raise MemoryError()
         __refs__[<uintptr_t>self._c_line] = self
+        self.__cells__ = set()
+        self.__childs__ = set()
         if parent is not None:
             scols_line_add_child(parent._c_line, self._c_line)
-            Py_INCREF(self)
-            Py_INCREF(parent)
+            parent.__childs__.add(self)
+            self._parent = parent
     def __dealloc__(self):
-        if self._c_line is not NULL:
-            scols_unref_line(self._c_line)
+        scols_unref_line(self._c_line)
 
     def __getitem__(self, Column column not None):
-        cdef Cell cell = Cell()
-        cell._c_cell = scols_line_get_column_cell(self._c_line, column._c_column)
-        return cell
+        cdef libscols_cell *ce = scols_line_get_column_cell(self._c_line, column._c_column)
+        return __refs__[<uintptr_t>ce]
     def __setitem__(self, Column column not None, basestring data):
         scols_line_set_column_data(self._c_line, column._c_column, data.encode("UTF-8"))
+
+    property parent:
+        """
+        Parent line.
+
+        :getter: Returns parent line
+        :type: smartcols.Line
+        """
+        def __get__(self):
+            return self._parent
 
     property color:
         """
@@ -385,8 +430,7 @@ cdef class Symbols:
         if self._c_symbols is NULL:
             raise MemoryError()
     def __dealloc__(self):
-        if self._c_symbols is not NULL:
-            scols_unref_symbols(self._c_symbols)
+        scols_unref_symbols(self._c_symbols)
 
     property branch:
         """
@@ -523,14 +567,19 @@ cdef class Table:
 
     cdef libscols_table *_c_table
     cdef Symbols _symbols
+    cdef Cell _title
+    cdef set __columns__
+    cdef set __lines__
 
     def __cinit__(self):
         self._c_table = scols_new_table()
         if self._c_table is NULL:
             raise MemoryError()
+        self.__columns__ = set()
+        self.__lines__ = set()
+        self._title = Title.new(scols_table_get_title(self._c_table))
     def __dealloc__(self):
-        if self._c_table is not NULL:
-            scols_unref_table(self._c_table)
+        scols_unref_table(self._c_table)
 
     def lines(self):
         """
@@ -609,7 +658,7 @@ cdef class Table:
         :type column: smartcols.Column
         """
         scols_table_add_column(self._c_table, column._c_column)
-        Py_INCREF(column)
+        self.__columns__.add(column)
     def new_column(self, *args, **kwargs):
         """
         new_column(self, *args, **kwargs)
@@ -634,7 +683,9 @@ cdef class Table:
         :type line: smartcols.Line
         """
         scols_table_add_line(self._c_table, line._c_line)
-        Py_INCREF(line)
+        self.__lines__.add(line)
+        for n in range(scols_line_get_ncells(line._c_line)):
+            line.__cells__.add(Cell.new(scols_line_get_cell(line._c_line, n)))
     def new_line(self, *args, **kwargs):
         """
         new_line(self, *args, **kwargs)
@@ -649,6 +700,19 @@ cdef class Table:
         cdef Line line = Line(*args, **kwargs)
         self.add_line(line)
         return line
+
+    property title:
+        """
+        Title of the table. Printed before table.
+
+        :getter: Get title object
+        :setter: Set title text (shortcut for :attr:`smartcols.Title.data`)
+        :type: weakproxy(smartcols.Title)
+        """
+        def __get__(self):
+            return weakref.proxy(self._title)
+        def __set__(self, basestring title):
+            self._title.data = title
 
     property ascii:
         """
@@ -727,17 +791,6 @@ cdef class Table:
                 scols_table_set_line_separator(self._c_table, separator.encode("UTF-8"))
             else:
                 scols_table_set_line_separator(self._c_table, NULL)
-
-    property title:
-        """
-        Title of the table. Printed before table. See :class:`smartcols.Title`.
-        """
-        def __get__(self):
-            cdef Title title = Title()
-            title._c_cell = scols_table_get_title(self._c_table)
-            return title
-        def __set__(self, basestring title):
-            self.title.data = title
 
     property termforce:
         """

@@ -73,6 +73,9 @@ cdef extern from "libsmartcols.h":
     void                scols_unref_line                  (libscols_line       *line)
     int                 scols_line_add_child              (libscols_line       *line,
                                                            libscols_line       *child)
+    size_t              scols_line_get_ncells             (libscols_line       *line)
+    libscols_cell      *scols_line_get_cell               (libscols_line       *line,
+                                                           size_t               n)
     libscols_cell      *scols_line_get_column_cell        (libscols_line       *line,
                                                            libscols_column     *column)
     int                 scols_line_set_column_data        (libscols_line       *line,

@@ -9,6 +9,14 @@ cdef extern from "libsmartcols.h":
                                                            void                *data)
 
     enum:
+        SCOLS_ITER_FORWARD
+        SCOLS_ITER_BACKWARD
+    struct libscols_iter:
+        pass
+    libscols_iter      *scols_new_iter                    (int                  direction)
+    void                scols_free_iter                   (libscols_iter       *iter)
+
+    enum:
         SCOLS_CELL_FL_LEFT
         SCOLS_CELL_FL_CENTER
         SCOLS_CELL_FL_RIGHT
@@ -109,10 +117,6 @@ cdef extern from "libsmartcols.h":
     int                 scols_table_enable_json           (libscols_table      *table,
                                                            bint                 value)
     bint                scols_table_is_ascii              (libscols_table      *table)
-    int                 scols_table_add_column            (libscols_table      *table,
-                                                           libscols_column     *column)
-    int                 scols_table_add_line              (libscols_table      *table,
-                                                           libscols_line       *line)
     int                 scols_table_enable_ascii          (libscols_table      *table,
                                                            bint                 value)
     bint                scols_table_colors_wanted         (libscols_table      *table)
@@ -126,9 +130,25 @@ cdef extern from "libsmartcols.h":
                                                            bint                 value)
     int                 scols_table_set_symbols           (libscols_table      *table,
                                                            libscols_symbols    *symbols)
+    int                 scols_table_get_ncols             (libscols_table      *table)
+    libscols_column    *scols_table_get_column            (libscols_table      *table,
+                                                           size_t               n)
+    int                 scols_table_add_column            (libscols_table      *table,
+                                                           libscols_column     *column)
+    int                 scols_table_next_column           (libscols_table      *table,
+                                                           libscols_iter       *iter,
+                                                           libscols_column    **column);
     char               *scols_table_get_column_separator  (libscols_table      *table)
     int                 scols_table_set_column_separator  (libscols_table      *table,
                                                            const char          *separator)
+    int                 scols_table_get_nlines            (libscols_table      *table)
+    libscols_line      *scols_table_get_line              (libscols_table      *table,
+                                                           size_t               n)
+    int                 scols_table_add_line              (libscols_table      *table,
+                                                           libscols_line       *line)
+    int                 scols_table_next_line             (libscols_table      *table,
+                                                           libscols_iter       *iter,
+                                                           libscols_line      **line);
     char               *scols_table_get_line_separator    (libscols_table      *table)
     int                 scols_table_set_line_separator    (libscols_table      *table,
                                                            const char          *separator)

@@ -19,11 +19,15 @@
 
 from libc.stdlib cimport malloc, free
 from libc.string cimport strcmp
+from libc.stdint cimport uintptr_t
+from cython cimport internal
 from cpython cimport Py_INCREF
 from csmartcols cimport *
 
 from warnings import warn
+import weakref
 
+cdef object __refs__ = weakref.WeakValueDictionary()
 cdef bint DEBUG_INITIALIZED = False
 
 cpdef void init_debug(int mask=0):
@@ -75,6 +79,18 @@ cdef int cmpfunc_wrapper(libscols_cell *a, libscols_cell *b, void *data):
     cdef CmpPayload *payload = <CmpPayload *>data
 
     return (<object>payload.func)(adata, bdata, <object>payload.data)
+
+@internal
+cdef class Iterator:
+    cdef libscols_iter *_itr
+
+    def __cinit__(self):
+        self._itr = scols_new_iter(SCOLS_ITER_FORWARD)
+        if self._itr is NULL:
+            raise MemoryError()
+    def __dealloc__(self):
+        if self._itr is not NULL:
+            scols_free_iter(self._itr)
 
 cdef class Cell:
     """
@@ -141,6 +157,7 @@ cdef class Column:
     :type name: str
     """
 
+    cdef object __weakref__
     cdef libscols_column *_c_column
     cdef CmpPayload *_cmp_payload
 
@@ -148,6 +165,7 @@ cdef class Column:
         self._c_column = scols_new_column()
         if self._c_column is NULL:
             raise MemoryError()
+        __refs__[<uintptr_t>self._c_column] = self
         if name is not None:
             self.name = name
     def __dealloc__(self):
@@ -313,12 +331,14 @@ cdef class Line:
         >>> line[column] = "bar"
     """
 
+    cdef object __weakref__
     cdef libscols_line *_c_line
 
     def __cinit__(self, Line parent=None):
         self._c_line = scols_new_line()
         if self._c_line is NULL:
             raise MemoryError()
+        __refs__[<uintptr_t>self._c_line] = self
         if parent is not None:
             scols_line_add_child(parent._c_line, self._c_line)
             Py_INCREF(self)
@@ -433,6 +453,50 @@ cdef class Symbols:
                 scols_symbols_set_cell_padding(self._c_symbols, NULL)
             self.__cell_padding = value
 
+@internal
+cdef class TableView(Iterator):
+    cdef Table _tb
+
+    def __cinit__(self, Table table not None):
+        self._tb = table
+
+    def __iter__(self):
+        return self
+
+cdef class ColumnsView(TableView):
+    def __len__(self):
+        return scols_table_get_ncols(self._tb._c_table)
+
+    def __next__(self):
+        cdef libscols_column *cl
+        while scols_table_next_column(self._tb._c_table, self._itr, &cl) == 0:
+            return __refs__[<uintptr_t>cl]
+        else:
+            raise StopIteration()
+
+    def __getitem__(self, int n):
+        cdef libscols_column *cl = scols_table_get_column(self._tb._c_table, n if n >= 0 else len(self) + n)
+        if cl is NULL:
+            raise IndexError("Column {:d} is out of range".format(n))
+        return __refs__[<uintptr_t>cl]
+
+cdef class LinesView(TableView):
+    def __len__(self):
+        return scols_table_get_nlines(self._tb._c_table)
+
+    def __next__(self):
+        cdef libscols_line *ln
+        while scols_table_next_line(self._tb._c_table, self._itr, &ln) == 0:
+            return __refs__[<uintptr_t>ln]
+        else:
+            raise StopIteration()
+
+    def __getitem__(self, int n):
+        cdef libscols_line *ln = scols_table_get_line(self._tb._c_table, n if n >= 0 else len(self) + n)
+        if ln is NULL:
+            raise IndexError("Line {:d} is out of range".format(n))
+        return __refs__[<uintptr_t>ln]
+
 cdef dict TableTermForce = {
     "auto": SCOLS_TERMFORCE_AUTO,
     "never": SCOLS_TERMFORCE_NEVER,
@@ -467,6 +531,24 @@ cdef class Table:
     def __dealloc__(self):
         if self._c_table is not NULL:
             scols_unref_table(self._c_table)
+
+    def lines(self):
+        """
+        lines(self)
+
+        :return: Lines view
+        :rtype: smartcols.LinesView
+        """
+        return LinesView(self)
+
+    def columns(self):
+        """
+        columns(self)
+
+        :return: Columns view
+        :rtype: smartcols.ColumnsView
+        """
+        return ColumnsView(self)
 
     def sort(self, Column column not None):
         scols_sort_table(self._c_table, column._c_column)

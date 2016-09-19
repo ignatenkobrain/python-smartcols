@@ -178,6 +178,7 @@ cdef class Column:
     cdef libscols_column *_c_column
     cdef Cell _header
     cdef CmpPayload *_cmp_payload
+    cdef object _cmpdata
 
     def __cinit__(self, basestring name=None):
         self._c_column = scols_new_column()
@@ -226,13 +227,14 @@ cdef class Column:
         """
         if self._cmp_payload is not NULL:
             free(self._cmp_payload)
+        self._cmpdata = data
         if func == cmpfunc_strcmp:
             scols_column_set_cmpfunc(self._c_column, scols_cmpstr_cells, NULL)
         else:
             self._cmp_payload = <CmpPayload *>malloc(sizeof(CmpPayload))
             if not self._cmp_payload:
                 raise MemoryError()
-            self._cmp_payload.data = <void *>data
+            self._cmp_payload.data = <void *>self._cmpdata
             self._cmp_payload.func = <void *>func
             scols_column_set_cmpfunc(self._c_column, cmpfunc_wrapper, <void *>self._cmp_payload)
 

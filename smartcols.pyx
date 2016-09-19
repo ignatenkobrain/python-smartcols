@@ -260,7 +260,7 @@ cdef class Column:
             self._cmp_payload.func = <void *>func
             scols_column_set_cmpfunc(self.ptr, cmpfunc_wrapper, <void *>self._cmp_payload)
 
-    cdef set_flag(self, int flag, bint v):
+    cdef void set_flag(self, int flag, bint v):
         cdef int flags = scols_column_get_flags(self.ptr)
         cdef bint current = flags & flag
         if not current and v:

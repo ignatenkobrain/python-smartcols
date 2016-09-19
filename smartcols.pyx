@@ -95,8 +95,7 @@ cdef class Iterator:
         if self.ptr is NULL:
             raise MemoryError()
     def __dealloc__(self):
-        if self.ptr is not NULL:
-            scols_free_iter(self.ptr)
+        scols_free_iter(self.ptr)
 
 cdef class Cell:
     """
@@ -385,10 +384,6 @@ cdef class Line:
 
     cdef object __weakref__
     cdef libscols_line *ptr
-    # Cells are automatically allocated by libsmartcols, but we want to return
-    # Python objects, so we will create cells as libsmartcols does internally
-    # and put them into set, once cell is removed in libsmartcols, we will
-    # drop it as well.
     cdef set __cells__
     cdef set __childs__
     cdef Line _parent
@@ -605,10 +600,10 @@ cdef class Table:
     """
 
     cdef libscols_table *ptr
-    cdef Symbols _symbols
-    cdef Cell _title
     cdef set __columns__
     cdef set __lines__
+    cdef Cell _title
+    cdef Symbols _symbols
 
     def __cinit__(self):
         self.ptr = scols_new_table()

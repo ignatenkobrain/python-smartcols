@@ -234,9 +234,9 @@ cdef class Column:
         :type: str
         """
         def __get__(self):
-            return self._header.data
+            return self.header.data
         def __set__(self, basestring name):
-            self._header.data = name
+            self.header.data = name
 
     def set_cmpfunc(self, object func not None, object data=None):
         """

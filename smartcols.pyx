@@ -104,6 +104,7 @@ cdef class Cell:
 
     cdef object __weakref__
     cdef libscols_cell *_c_cell
+    cdef object _userdata
 
     @staticmethod
     cdef Cell new(libscols_cell *cell):
@@ -124,6 +125,20 @@ cdef class Cell:
                 scols_cell_set_data(self._c_cell, data.encode("UTF-8"))
             else:
                 scols_cell_set_data(self._c_cell, NULL)
+
+    property userdata:
+        """
+        Private user data.
+
+        :getter: Returns data
+        :setter: Sets data
+        :type: object
+        """
+        def __get__(self):
+            return self._userdata
+        def __set__(self, object data):
+            self._userdata = data
+            scols_cell_set_userdata(self._c_cell, <void *>self._userdata)
 
     property color:
         """
@@ -370,6 +385,7 @@ cdef class Line:
     cdef set __cells__
     cdef set __childs__
     cdef Line _parent
+    cdef object _userdata
 
     def __cinit__(self, Line parent=None):
         self._c_line = scols_new_line()
@@ -400,6 +416,20 @@ cdef class Line:
         """
         def __get__(self):
             return self._parent
+
+    property userdata:
+        """
+        Private user data.
+
+        :getter: Returns data
+        :setter: Sets data
+        :type: object
+        """
+        def __get__(self):
+            return self._userdata
+        def __set__(self, object data):
+            self._userdata = data
+            scols_line_set_userdata(self._c_line, <void *>self._userdata)
 
     property color:
         """

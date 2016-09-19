@@ -25,6 +25,8 @@ cdef extern from "libsmartcols.h":
     const char         *scols_cell_get_data               (const libscols_cell *cell)
     int                 scols_cell_set_data               (libscols_cell       *cell,
                                                            const char          *data)
+    int                 scols_cell_set_userdata           (libscols_cell       *cell,
+                                                           void                *data)
     const char         *scols_cell_get_color              (const libscols_cell *cell)
     int                 scols_cell_set_color              (libscols_cell       *cell,
                                                            const char          *color)
@@ -81,6 +83,8 @@ cdef extern from "libsmartcols.h":
     int                 scols_line_set_column_data        (libscols_line       *line,
                                                            libscols_column     *column,
                                                            const char          *data)
+    int                 scols_line_set_userdata           (libscols_line       *line,
+                                                           void                *data)
     const char         *scols_line_get_color              (libscols_line       *line)
     int                 scols_line_set_color              (libscols_line       *line,
                                                            const char          *color)

@@ -36,5 +36,5 @@ Useful Functions
 
 .. autofunction:: smartcols.init_debug
 
-.. autofunction:: smartcols.cmpfunc_strcmp
+.. autofunction:: smartcols.cmpstr_cells
 

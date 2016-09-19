@@ -55,36 +55,36 @@ cdef struct CmpPayload:
     void *data
     void *func
 
-cpdef int cmpfunc_strcmp(basestring c1, basestring c2, object data=None):
+def cmpstr_cells(Cell c1 not None, Cell c2 not None, object data=None):
     """
-    cmpfunc_strcmp(c1, c2, data=None)
+    cmpstr_cells(c1, c2, data=None)
     Shorthand wrapper around strcmp(). `data` is ignored.
 
     :param c1: First cell
-    :type c1: str
+    :type c1: smartcols.Cell
     :param c2: Second cell
-    :type c2: str
+    :type c2: smartcols.Cell
     :param data: (unused) Additional data
     :type data: object
     """
     # Must be same as scols_cmpstr_cells().
-    if not c1 and not c2:
+    if not c1.data and not c2.data:
         return 0
-    if not c1:
+    if not c1.data:
         return -1
-    if not c2:
+    if not c2.data:
         return 1
-    return strcmp(c1.encode("UTF-8"), c2.encode("UTF-8"))
+    return strcmp(c1.data.encode("UTF-8"), c2.data.encode("UTF-8"))
 
 cdef int cmpfunc_wrapper(libscols_cell *a, libscols_cell *b, void *data):
     if a == b:
         return 0
 
-    cdef const char *adata = scols_cell_get_data(a)
-    cdef const char *bdata = scols_cell_get_data(b)
+    cdef Cell acell = __refs__[<uintptr_t>a]
+    cdef Cell bcell = __refs__[<uintptr_t>b]
     cdef CmpPayload *payload = <CmpPayload *>data
 
-    return (<object>payload.func)(adata, bdata, <object>payload.data)
+    return (<object>payload.func)(acell, bcell, <object>payload.data)
 
 @internal
 cdef class Iterator:
@@ -242,7 +242,7 @@ cdef class Column:
         """
         set_cmpfunc(self, func, data=None)
         Set sorting function for the column. If `func` is None then default
-        (:func:`smartcols.cmpfunc_strcmp`) comparator will be used.
+        (:func:`smartcols.cmpstr_cells`) comparator will be used.
 
         :param function func: Comparison function (c1, c2, data)
         :param object data: Additional data for function
@@ -250,7 +250,7 @@ cdef class Column:
         if self._cmp_payload is not NULL:
             free(self._cmp_payload)
         self._cmpdata = data
-        if func == cmpfunc_strcmp:
+        if func == cmpstr_cells:
             scols_column_set_cmpfunc(self.ptr, scols_cmpstr_cells, NULL)
         else:
             self._cmp_payload = <CmpPayload *>malloc(sizeof(CmpPayload))

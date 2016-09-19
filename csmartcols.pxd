@@ -137,7 +137,7 @@ cdef extern from "libsmartcols.h":
                                                            bint                 value)
     int                 scols_table_set_symbols           (libscols_table      *table,
                                                            libscols_symbols    *symbols)
-    int                 scols_table_get_ncols             (libscols_table      *table)
+    size_t              scols_table_get_ncols             (libscols_table      *table)
     libscols_column    *scols_table_get_column            (libscols_table      *table,
                                                            size_t               n)
     int                 scols_table_add_column            (libscols_table      *table,
@@ -148,7 +148,7 @@ cdef extern from "libsmartcols.h":
     char               *scols_table_get_column_separator  (libscols_table      *table)
     int                 scols_table_set_column_separator  (libscols_table      *table,
                                                            const char          *separator)
-    int                 scols_table_get_nlines            (libscols_table      *table)
+    size_t              scols_table_get_nlines            (libscols_table      *table)
     libscols_line      *scols_table_get_line              (libscols_table      *table,
                                                            size_t               n)
     int                 scols_table_add_line              (libscols_table      *table,

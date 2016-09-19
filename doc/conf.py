@@ -302,7 +302,7 @@ texinfo_documents = [
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
 
-autodoc_default_flags = ["members"]
+autodoc_default_flags = ["show-inheritance", "members", "inherited-members", "special-methods"]
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'https://docs.python.org/': None}

@@ -40,7 +40,8 @@ cpdef void init_debug(int mask=0):
 
     Don't call this function multiple times.
 
-    :param int mask: Debug mask (0xffff to enable full debugging)
+    :param mask: Debug mask (0xffff to enable full debugging)
+    :type mask: int
     """
     global DEBUG_INITIALIZED
     if DEBUG_INITIALIZED:
@@ -54,23 +55,26 @@ cdef struct CmpPayload:
     void *data
     void *func
 
-cpdef int cmpfunc_strcmp(basestring s1, basestring s2, object data=None):
+cpdef int cmpfunc_strcmp(basestring c1, basestring c2, object data=None):
     """
-    cmpfunc_strcmp(s1, s2, data=None)
+    cmpfunc_strcmp(c1, c2, data=None)
     Shorthand wrapper around strcmp(). `data` is ignored.
 
-    :param str s1: First string
-    :param str s2: Second string
-    :param object data: (unused) Additional data
+    :param c1: First cell
+    :type c1: str
+    :param c2: Second cell
+    :type c2: str
+    :param data: (unused) Additional data
+    :type data: object
     """
     # Must be same as scols_cmpstr_cells().
-    if not s1 and not s2:
+    if not c1 and not c2:
         return 0
-    if not s1:
+    if not c1:
         return -1
-    if not s2:
+    if not c2:
         return 1
-    return strcmp(s1.encode("UTF-8"), s2.encode("UTF-8"))
+    return strcmp(c1.encode("UTF-8"), c2.encode("UTF-8"))
 
 cdef int cmpfunc_wrapper(libscols_cell *a, libscols_cell *b, void *data):
     if a == b:
@@ -161,6 +165,9 @@ cdef dict TitlePosition = {
 cdef class Title(Cell):
     """
     Title.
+
+    There is no way to create title, only way to get this object is from
+    :class:`smartcols.Table`.
     """
 
     @staticmethod
@@ -235,9 +242,9 @@ cdef class Column:
         """
         set_cmpfunc(self, func, data=None)
         Set sorting function for the column. If `func` is None then default
-        (strcmp-based) comparator will be used.
+        (:func:`smartcols.cmpfunc_strcmp`) comparator will be used.
 
-        :param function func: Comparison function (s1, s2, data)
+        :param function func: Comparison function (c1, c2, data)
         :param object data: Additional data for function
         """
         if self._cmp_payload is not NULL:
@@ -323,7 +330,7 @@ cdef class Column:
 
     property wrapnl:
         """
-        Wrap long lines to multi-line cells based on newline (``\n``).
+        Wrap long lines to multi-line cells based on newline.
         """
         def __get__(self):
             return scols_column_is_wrapnl(self.ptr)

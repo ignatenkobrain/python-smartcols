@@ -6,6 +6,11 @@ Cell
 
 .. autoclass:: smartcols.Cell
 
+Title
+-----
+
+.. autoclass:: smartcols.Title
+
 Column
 ------
 
@@ -21,16 +26,15 @@ Symbols
 
 .. autoclass:: smartcols.Symbols
 
-Title
------
-
-.. autoclass:: smartcols.Title
-   :show-inheritance:
-
 Table
 -----
 
 .. autoclass:: smartcols.Table
 
-   .. automethod:: smartcols.Table.__str__
+Useful Functions
+----------------
+
+.. autofunction:: smartcols.init_debug
+
+.. autofunction:: smartcols.cmpfunc_strcmp
 

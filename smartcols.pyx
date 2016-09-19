@@ -84,15 +84,15 @@ cdef int cmpfunc_wrapper(libscols_cell *a, libscols_cell *b, void *data):
 
 @internal
 cdef class Iterator:
-    cdef libscols_iter *_itr
+    cdef libscols_iter *ptr
 
     def __cinit__(self):
-        self._itr = scols_new_iter(SCOLS_ITER_FORWARD)
-        if self._itr is NULL:
+        self.ptr = scols_new_iter(SCOLS_ITER_FORWARD)
+        if self.ptr is NULL:
             raise MemoryError()
     def __dealloc__(self):
-        if self._itr is not NULL:
-            scols_free_iter(self._itr)
+        if self.ptr is not NULL:
+            scols_free_iter(self.ptr)
 
 cdef class Cell:
     """
@@ -103,14 +103,14 @@ cdef class Cell:
     """
 
     cdef object __weakref__
-    cdef libscols_cell *_c_cell
+    cdef libscols_cell *ptr
     cdef object _userdata
 
     @staticmethod
     cdef Cell new(libscols_cell *cell):
         ce = Cell()
-        ce._c_cell = cell
-        __refs__[<uintptr_t>ce._c_cell] = ce
+        ce.ptr = cell
+        __refs__[<uintptr_t>ce.ptr] = ce
         return ce
 
     property data:
@@ -118,13 +118,13 @@ cdef class Cell:
         Text in cell.
         """
         def __get__(self):
-            cdef const char *d = scols_cell_get_data(self._c_cell)
+            cdef const char *d = scols_cell_get_data(self.ptr)
             return d if d is not NULL else None
         def __set__(self, basestring data):
             if data is not None:
-                scols_cell_set_data(self._c_cell, data.encode("UTF-8"))
+                scols_cell_set_data(self.ptr, data.encode("UTF-8"))
             else:
-                scols_cell_set_data(self._c_cell, NULL)
+                scols_cell_set_data(self.ptr, NULL)
 
     property userdata:
         """
@@ -138,20 +138,20 @@ cdef class Cell:
             return self._userdata
         def __set__(self, object data):
             self._userdata = data
-            scols_cell_set_userdata(self._c_cell, <void *>self._userdata)
+            scols_cell_set_userdata(self.ptr, <void *>self._userdata)
 
     property color:
         """
         Color for text in cell.
         """
         def __get__(self):
-            cdef const char *c = scols_cell_get_color(self._c_cell)
+            cdef const char *c = scols_cell_get_color(self.ptr)
             return c if c is not NULL else None
         def __set__(self, basestring color):
             if color is not None:
-                scols_cell_set_color(self._c_cell, color.encode("UTF-8"))
+                scols_cell_set_color(self.ptr, color.encode("UTF-8"))
             else:
-                scols_cell_set_color(self._c_cell, NULL)
+                scols_cell_set_color(self.ptr, NULL)
 
 cdef dict TitlePosition = {
     "left": SCOLS_CELL_FL_LEFT,
@@ -166,8 +166,8 @@ cdef class Title(Cell):
     @staticmethod
     cdef Title new(libscols_cell *cell):
         ce = Title()
-        ce._c_cell = cell
-        __refs__[<uintptr_t>ce._c_cell] = ce
+        ce.ptr = cell
+        __refs__[<uintptr_t>ce.ptr] = ce
         return ce
 
     property position:
@@ -175,10 +175,10 @@ cdef class Title(Cell):
         Position. One of `left`, `center` or `right`.
         """
         def __get__(self):
-            cdef int pos = scols_cell_get_flags(self._c_cell)
+            cdef int pos = scols_cell_get_flags(self.ptr)
             return next(k for k, v in TitlePosition.items() if v == pos)
         def __set__(self, basestring position not None):
-            scols_cell_set_flags(self._c_cell, TitlePosition[position])
+            scols_cell_set_flags(self.ptr, TitlePosition[position])
 
 cdef class Column:
     """
@@ -190,21 +190,21 @@ cdef class Column:
     """
 
     cdef object __weakref__
-    cdef libscols_column *_c_column
+    cdef libscols_column *ptr
     cdef Cell _header
     cdef CmpPayload *_cmp_payload
     cdef object _cmpdata
 
     def __cinit__(self, basestring name=None):
-        self._c_column = scols_new_column()
-        if self._c_column is NULL:
+        self.ptr = scols_new_column()
+        if self.ptr is NULL:
             raise MemoryError()
-        __refs__[<uintptr_t>self._c_column] = self
-        self._header = Cell.new(scols_column_get_header(self._c_column))
+        __refs__[<uintptr_t>self.ptr] = self
+        self._header = Cell.new(scols_column_get_header(self.ptr))
         if name is not None:
             self.name = name
     def __dealloc__(self):
-        scols_unref_column(self._c_column)
+        scols_unref_column(self.ptr)
         free(self._cmp_payload)
 
     property header:
@@ -244,29 +244,29 @@ cdef class Column:
             free(self._cmp_payload)
         self._cmpdata = data
         if func == cmpfunc_strcmp:
-            scols_column_set_cmpfunc(self._c_column, scols_cmpstr_cells, NULL)
+            scols_column_set_cmpfunc(self.ptr, scols_cmpstr_cells, NULL)
         else:
             self._cmp_payload = <CmpPayload *>malloc(sizeof(CmpPayload))
             if not self._cmp_payload:
                 raise MemoryError()
             self._cmp_payload.data = <void *>self._cmpdata
             self._cmp_payload.func = <void *>func
-            scols_column_set_cmpfunc(self._c_column, cmpfunc_wrapper, <void *>self._cmp_payload)
+            scols_column_set_cmpfunc(self.ptr, cmpfunc_wrapper, <void *>self._cmp_payload)
 
     cdef set_flag(self, int flag, bint v):
-        cdef int flags = scols_column_get_flags(self._c_column)
+        cdef int flags = scols_column_get_flags(self.ptr)
         cdef bint current = flags & flag
         if not current and v:
-            scols_column_set_flags(self._c_column, flags | flag)
+            scols_column_set_flags(self.ptr, flags | flag)
         elif current and not v:
-            scols_column_set_flags(self._c_column, flags ^ flag)
+            scols_column_set_flags(self.ptr, flags ^ flag)
 
     property trunc:
         """
         Truncate text in cells if necessary.
         """
         def __get__(self):
-            return scols_column_is_trunc(self._c_column)
+            return scols_column_is_trunc(self.ptr)
         def __set__(self, bint value):
             self.set_flag(SCOLS_FL_TRUNC, value)
 
@@ -275,7 +275,7 @@ cdef class Column:
         Use tree "ASCII Art".
         """
         def __get__(self):
-            return scols_column_is_tree(self._c_column)
+            return scols_column_is_tree(self.ptr)
         def __set__(self, bint value):
             self.set_flag(SCOLS_FL_TREE, value)
 
@@ -284,7 +284,7 @@ cdef class Column:
         Align text in cells to the right.
         """
         def __get__(self):
-            return scols_column_is_right(self._c_column)
+            return scols_column_is_right(self.ptr)
         def __set__(self, bint value):
             self.set_flag(SCOLS_FL_RIGHT, value)
 
@@ -293,13 +293,13 @@ cdef class Column:
         Do not reduce width if column is empty.
         """
         def __get__(self):
-            return scols_column_is_strict_width(self._c_column)
+            return scols_column_is_strict_width(self.ptr)
         def __set__(self, bint value):
             self.set_flag(SCOLS_FL_STRICTWIDTH, value)
 
     property noextremes:
         def __get__(self):
-            return scols_column_is_noextremes(self._c_column)
+            return scols_column_is_noextremes(self.ptr)
         def __set__(self, bint value):
             self.set_flag(SCOLS_FL_NOEXTREMES, value)
 
@@ -308,7 +308,7 @@ cdef class Column:
         Make column hidden for user.
         """
         def __get__(self):
-            return scols_column_is_hidden(self._c_column)
+            return scols_column_is_hidden(self.ptr)
         def __set__(self, bint value):
             self.set_flag(SCOLS_FL_HIDDEN, value)
 
@@ -317,7 +317,7 @@ cdef class Column:
         Wrap long lines to multi-line cells.
         """
         def __get__(self):
-            return scols_column_is_wrap(self._c_column)
+            return scols_column_is_wrap(self.ptr)
         def __set__(self, bint value):
             self.set_flag(SCOLS_FL_WRAP, value)
 
@@ -326,7 +326,7 @@ cdef class Column:
         Wrap long lines to multi-line cells based on newline (``\n``).
         """
         def __get__(self):
-            return scols_column_is_wrapnl(self._c_column)
+            return scols_column_is_wrapnl(self.ptr)
         def __set__(self, bint value):
             self.set_flag(SCOLS_FL_WRAPNL, value)
 
@@ -335,22 +335,22 @@ cdef class Column:
         The default color for data cells in column and column header.
         """
         def __get__(self):
-            cdef const char *c = scols_column_get_color(self._c_column)
+            cdef const char *c = scols_column_get_color(self.ptr)
             return c if c is not NULL else None
         def __set__(self, basestring color):
             if color is not None:
-                scols_column_set_color(self._c_column, color.encode("UTF-8"))
+                scols_column_set_color(self.ptr, color.encode("UTF-8"))
             else:
-                scols_column_set_color(self._c_column, NULL)
+                scols_column_set_color(self.ptr, NULL)
 
     property whint:
         """
         Width hint of column.
         """
         def __get__(self):
-            return scols_column_get_whint(self._c_column)
+            return scols_column_get_whint(self.ptr)
         def __set__(self, double whint):
-            scols_column_set_whint(self._c_column, whint)
+            scols_column_set_whint(self.ptr, whint)
 
 cdef class Line:
     """
@@ -377,7 +377,7 @@ cdef class Line:
     """
 
     cdef object __weakref__
-    cdef libscols_line *_c_line
+    cdef libscols_line *ptr
     # Cells are automatically allocated by libsmartcols, but we want to return
     # Python objects, so we will create cells as libsmartcols does internally
     # and put them into set, once cell is removed in libsmartcols, we will
@@ -388,24 +388,24 @@ cdef class Line:
     cdef object _userdata
 
     def __cinit__(self, Line parent=None):
-        self._c_line = scols_new_line()
-        if self._c_line is NULL:
+        self.ptr = scols_new_line()
+        if self.ptr is NULL:
             raise MemoryError()
-        __refs__[<uintptr_t>self._c_line] = self
+        __refs__[<uintptr_t>self.ptr] = self
         self.__cells__ = set()
         self.__childs__ = set()
         if parent is not None:
-            scols_line_add_child(parent._c_line, self._c_line)
+            scols_line_add_child(parent.ptr, self.ptr)
             parent.__childs__.add(self)
             self._parent = parent
     def __dealloc__(self):
-        scols_unref_line(self._c_line)
+        scols_unref_line(self.ptr)
 
     def __getitem__(self, Column column not None):
-        cdef libscols_cell *ce = scols_line_get_column_cell(self._c_line, column._c_column)
+        cdef libscols_cell *ce = scols_line_get_column_cell(self.ptr, column.ptr)
         return __refs__[<uintptr_t>ce]
     def __setitem__(self, Column column not None, basestring data):
-        scols_line_set_column_data(self._c_line, column._c_column, data.encode("UTF-8"))
+        scols_line_set_column_data(self.ptr, column.ptr, data.encode("UTF-8"))
 
     property parent:
         """
@@ -429,20 +429,20 @@ cdef class Line:
             return self._userdata
         def __set__(self, object data):
             self._userdata = data
-            scols_line_set_userdata(self._c_line, <void *>self._userdata)
+            scols_line_set_userdata(self.ptr, <void *>self._userdata)
 
     property color:
         """
         The color for data cells in line.
         """
         def __get__(self):
-            cdef const char *c = scols_line_get_color(self._c_line)
+            cdef const char *c = scols_line_get_color(self.ptr)
             return c if c is not NULL else None
         def __set__(self, basestring color):
             if color is not None:
-                scols_line_set_color(self._c_line, color.encode("UTF-8"))
+                scols_line_set_color(self.ptr, color.encode("UTF-8"))
             else:
-                scols_line_set_color(self._c_line, NULL)
+                scols_line_set_color(self.ptr, NULL)
 
 cdef class Symbols:
     """
@@ -450,84 +450,84 @@ cdef class Symbols:
     Symbols.
     """
 
-    cdef libscols_symbols *_c_symbols
-    cdef basestring __branch
-    cdef basestring __right
-    cdef basestring __vertical
-    cdef basestring __title_padding
-    cdef basestring __cell_padding
+    cdef libscols_symbols *ptr
+    cdef basestring _branch
+    cdef basestring _right
+    cdef basestring _vertical
+    cdef basestring _title_padding
+    cdef basestring _cell_padding
 
     def __cinit__(self):
-        self._c_symbols = scols_new_symbols()
-        if self._c_symbols is NULL:
+        self.ptr = scols_new_symbols()
+        if self.ptr is NULL:
             raise MemoryError()
     def __dealloc__(self):
-        scols_unref_symbols(self._c_symbols)
+        scols_unref_symbols(self.ptr)
 
     property branch:
         """
         String which represents the branch part of a tree output.
         """
         def __get__(self):
-            return self.__branch
+            return self._branch
         def __set__(self, basestring value):
             if value is not None:
-                scols_symbols_set_branch(self._c_symbols, value.encode("UTF-8"))
+                scols_symbols_set_branch(self.ptr, value.encode("UTF-8"))
             else:
-                scols_symbols_set_branch(self._c_symbols, NULL)
-            self.__branch = value
+                scols_symbols_set_branch(self.ptr, NULL)
+            self._branch = value
 
     property right:
         """
         Right part of a tree output.
         """
         def __get__(self):
-            return self.__right
+            return self._right
         def __set__(self, basestring value):
             if value is not None:
-                scols_symbols_set_right(self._c_symbols, value.encode("UTF-8"))
+                scols_symbols_set_right(self.ptr, value.encode("UTF-8"))
             else:
-                scols_symbols_set_right(self._c_symbols, NULL)
-            self.__right = value
+                scols_symbols_set_right(self.ptr, NULL)
+            self._right = value
 
     property vertical:
         """
         Vertical part of a tree output.
         """
         def __get__(self):
-            return self.__vertical
+            return self._vertical
         def __set__(self, basestring value):
             if value is not None:
-                scols_symbols_set_vertical(self._c_symbols, value.encode("UTF-8"))
+                scols_symbols_set_vertical(self.ptr, value.encode("UTF-8"))
             else:
-                scols_symbols_set_vertical(self._c_symbols, NULL)
-            self.__vertical = value
+                scols_symbols_set_vertical(self.ptr, NULL)
+            self._vertical = value
 
     property title_padding:
         """
         Padding of a table's title.
         """
         def __get__(self):
-            return self.__title_padding
+            return self._title_padding
         def __set__(self, basestring value):
             if value is not None:
-                scols_symbols_set_title_padding(self._c_symbols, value.encode("UTF-8"))
+                scols_symbols_set_title_padding(self.ptr, value.encode("UTF-8"))
             else:
-                scols_symbols_set_title_padding(self._c_symbols, NULL)
-            self.__title_padding = value
+                scols_symbols_set_title_padding(self.ptr, NULL)
+            self._title_padding = value
 
     property cell_padding:
         """
         Padding of a table's cells.
         """
         def __get__(self):
-            return self.__cell_padding
+            return self._cell_padding
         def __set__(self, basestring value):
             if value is not None:
-                scols_symbols_set_cell_padding(self._c_symbols, value.encode("UTF-8"))
+                scols_symbols_set_cell_padding(self.ptr, value.encode("UTF-8"))
             else:
-                scols_symbols_set_cell_padding(self._c_symbols, NULL)
-            self.__cell_padding = value
+                scols_symbols_set_cell_padding(self.ptr, NULL)
+            self._cell_padding = value
 
 @internal
 cdef class TableView(Iterator):
@@ -541,34 +541,34 @@ cdef class TableView(Iterator):
 
 cdef class ColumnsView(TableView):
     def __len__(self):
-        return scols_table_get_ncols(self._tb._c_table)
+        return scols_table_get_ncols(self._tb.ptr)
 
     def __next__(self):
         cdef libscols_column *cl
-        while scols_table_next_column(self._tb._c_table, self._itr, &cl) == 0:
+        while scols_table_next_column(self._tb.ptr, self.ptr, &cl) == 0:
             return __refs__[<uintptr_t>cl]
         else:
             raise StopIteration()
 
     def __getitem__(self, int n):
-        cdef libscols_column *cl = scols_table_get_column(self._tb._c_table, n if n >= 0 else len(self) + n)
+        cdef libscols_column *cl = scols_table_get_column(self._tb.ptr, n if n >= 0 else len(self) + n)
         if cl is NULL:
             raise IndexError("Column {:d} is out of range".format(n))
         return __refs__[<uintptr_t>cl]
 
 cdef class LinesView(TableView):
     def __len__(self):
-        return scols_table_get_nlines(self._tb._c_table)
+        return scols_table_get_nlines(self._tb.ptr)
 
     def __next__(self):
         cdef libscols_line *ln
-        while scols_table_next_line(self._tb._c_table, self._itr, &ln) == 0:
+        while scols_table_next_line(self._tb.ptr, self.ptr, &ln) == 0:
             return __refs__[<uintptr_t>ln]
         else:
             raise StopIteration()
 
     def __getitem__(self, int n):
-        cdef libscols_line *ln = scols_table_get_line(self._tb._c_table, n if n >= 0 else len(self) + n)
+        cdef libscols_line *ln = scols_table_get_line(self._tb.ptr, n if n >= 0 else len(self) + n)
         if ln is NULL:
             raise IndexError("Line {:d} is out of range".format(n))
         return __refs__[<uintptr_t>ln]
@@ -597,21 +597,21 @@ cdef class Table:
         Igor Gnatenko  18
     """
 
-    cdef libscols_table *_c_table
+    cdef libscols_table *ptr
     cdef Symbols _symbols
     cdef Cell _title
     cdef set __columns__
     cdef set __lines__
 
     def __cinit__(self):
-        self._c_table = scols_new_table()
-        if self._c_table is NULL:
+        self.ptr = scols_new_table()
+        if self.ptr is NULL:
             raise MemoryError()
         self.__columns__ = set()
         self.__lines__ = set()
-        self._title = Title.new(scols_table_get_title(self._c_table))
+        self._title = Title.new(scols_table_get_title(self.ptr))
     def __dealloc__(self):
-        scols_unref_table(self._c_table)
+        scols_unref_table(self.ptr)
 
     def lines(self):
         """
@@ -632,7 +632,7 @@ cdef class Table:
         return ColumnsView(self)
 
     def sort(self, Column column not None):
-        scols_sort_table(self._c_table, column._c_column)
+        scols_sort_table(self.ptr, column.ptr)
 
     def __str__(self):
         """
@@ -643,7 +643,7 @@ cdef class Table:
         :rtype: string
         """
         cdef char *data = NULL
-        scols_print_table_to_string(self._c_table, &data)
+        scols_print_table_to_string(self.ptr, &data)
         cdef str ret = data
         free(data)
         return ret
@@ -661,9 +661,9 @@ cdef class Table:
         :rtype: str
         """
         cdef char *data = NULL
-        scols_table_enable_nolinesep(self._c_table, True)
-        scols_table_print_range_to_string(self._c_table, start._c_line if start is not None else NULL, end._c_line if end is not None else NULL, &data)
-        scols_table_enable_nolinesep(self._c_table, False)
+        scols_table_enable_nolinesep(self.ptr, True)
+        scols_table_print_range_to_string(self.ptr, start.ptr if start is not None else NULL, end.ptr if end is not None else NULL, &data)
+        scols_table_enable_nolinesep(self.ptr, False)
         cdef str ret = data
         free(data)
         return ret
@@ -675,10 +675,10 @@ cdef class Table:
         :return: JSON dictionary
         :rtype: dict
         """
-        scols_table_enable_json(self._c_table, True)
+        scols_table_enable_json(self.ptr, True)
         from json import loads
         cdef dict ret = loads(self.__str__())
-        scols_table_enable_json(self._c_table, False)
+        scols_table_enable_json(self.ptr, False)
         return ret
 
     def add_column(self, Column column not None):
@@ -689,7 +689,7 @@ cdef class Table:
         :param column: Column
         :type column: smartcols.Column
         """
-        scols_table_add_column(self._c_table, column._c_column)
+        scols_table_add_column(self.ptr, column.ptr)
         self.__columns__.add(column)
     def new_column(self, *args, **kwargs):
         """
@@ -714,10 +714,10 @@ cdef class Table:
         :param line: Line
         :type line: smartcols.Line
         """
-        scols_table_add_line(self._c_table, line._c_line)
+        scols_table_add_line(self.ptr, line.ptr)
         self.__lines__.add(line)
-        for n in range(scols_line_get_ncells(line._c_line)):
-            line.__cells__.add(Cell.new(scols_line_get_cell(line._c_line, n)))
+        for n in range(scols_line_get_ncells(line.ptr)):
+            line.__cells__.add(Cell.new(scols_line_get_cell(line.ptr, n)))
     def new_line(self, *args, **kwargs):
         """
         new_line(self, *args, **kwargs)
@@ -752,18 +752,18 @@ cdef class Table:
         with :attr:`smartcols.Column.tree` activated.
         """
         def __get__(self):
-            return scols_table_is_ascii(self._c_table)
+            return scols_table_is_ascii(self.ptr)
         def __set__(self, bint value):
-            scols_table_enable_ascii(self._c_table, value)
+            scols_table_enable_ascii(self.ptr, value)
 
     property colors:
         """
         Enable/Disable colors.
         """
         def __get__(self):
-            return scols_table_colors_wanted(self._c_table)
+            return scols_table_colors_wanted(self.ptr)
         def __set__(self, bint value):
-            scols_table_enable_colors(self._c_table, value)
+            scols_table_enable_colors(self.ptr, value)
 
     property maxout:
         """
@@ -772,18 +772,18 @@ cdef class Table:
         full width of terminal.
         """
         def __get__(self):
-            return scols_table_is_maxout(self._c_table)
+            return scols_table_is_maxout(self.ptr)
         def __set__(self, bint value):
-            scols_table_enable_maxout(self._c_table, value)
+            scols_table_enable_maxout(self.ptr, value)
 
     property noheadings:
         """
         Do not print header.
         """
         def __get__(self):
-            return scols_table_is_noheadings(self._c_table)
+            return scols_table_is_noheadings(self.ptr)
         def __set__(self, bint value):
-            scols_table_enable_noheadings(self._c_table, value)
+            scols_table_enable_noheadings(self.ptr, value)
 
     property symbols:
         """
@@ -793,9 +793,9 @@ cdef class Table:
             return self._symbols
         def __set__(self, Symbols symbols):
             if symbols is not None:
-                scols_table_set_symbols(self._c_table, symbols._c_symbols)
+                scols_table_set_symbols(self.ptr, symbols.ptr)
             else:
-                scols_table_set_symbols(self._c_table, NULL)
+                scols_table_set_symbols(self.ptr, NULL)
             self._symbols = symbols
 
     property column_separator:
@@ -803,36 +803,36 @@ cdef class Table:
         Column separator.
         """
         def __get__(self):
-            cdef const char *sep = scols_table_get_column_separator(self._c_table)
+            cdef const char *sep = scols_table_get_column_separator(self.ptr)
             return sep if sep is not NULL else None
         def __set__(self, basestring separator):
             if separator is not None:
-                scols_table_set_column_separator(self._c_table, separator.encode("UTF-8"))
+                scols_table_set_column_separator(self.ptr, separator.encode("UTF-8"))
             else:
-                scols_table_set_column_separator(self._c_table, NULL)
+                scols_table_set_column_separator(self.ptr, NULL)
 
     property line_separator:
         """
         Line separator.
         """
         def __get__(self):
-            cdef const char *sep = scols_table_get_line_separator(self._c_table)
+            cdef const char *sep = scols_table_get_line_separator(self.ptr)
             return sep if sep is not NULL else None
         def __set__(self, basestring separator):
             if separator is not None:
-                scols_table_set_line_separator(self._c_table, separator.encode("UTF-8"))
+                scols_table_set_line_separator(self.ptr, separator.encode("UTF-8"))
             else:
-                scols_table_set_line_separator(self._c_table, NULL)
+                scols_table_set_line_separator(self.ptr, NULL)
 
     property termforce:
         """
         Force terminal output. One of `auto`, `never`, `always`.
         """
         def __get__(self):
-            cdef int force = scols_table_get_termforce(self._c_table)
+            cdef int force = scols_table_get_termforce(self.ptr)
             return next(k for k, v in TableTermForce.items() if v == force)
         def __set__(self, basestring force not None):
-            scols_table_set_termforce(self._c_table, TableTermForce[force])
+            scols_table_set_termforce(self.ptr, TableTermForce[force])
 
     property termwidth:
         """
@@ -840,6 +840,6 @@ cdef class Table:
         failure it uses 80 characters. You can override terminal width here.
         """
         def __get__(self):
-            return scols_table_get_termwidth(self._c_table)
+            return scols_table_get_termwidth(self.ptr)
         def __set__(self, size_t width):
-            scols_table_set_termwidth(self._c_table, width)
+            scols_table_set_termwidth(self.ptr, width)

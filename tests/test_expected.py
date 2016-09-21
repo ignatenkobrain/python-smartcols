@@ -1,0 +1,191 @@
+import pytest
+
+from . import data, expected
+from .fixtures import posix_locale
+from .samples import fromfile, title
+
+@pytest.mark.parametrize("name, args", [
+    ("tree", ["--nlines", "10",
+              "--tree-id-column", "1",
+              "--tree-parent-column", "2",
+              "--column", data("col-tree"),
+              "--column", data("col-id"),
+              "--column", data("col-parent"),
+              "--column", data("col-string"),
+              data("data-string"),
+              data("data-id"),
+              data("data-parent"),
+              data("data-string-long")]),
+    pytest.mark.xfail(("tree-json", [
+        "--nlines", "10",
+        "--json",
+        "--tree-id-column", "1",
+        "--tree-parent-column", "2",
+        "--column", data("col-tree"),
+        "--column", data("col-id"),
+        "--column", data("col-parent"),
+        "--column", data("col-string"),
+        data("data-string"),
+        data("data-id"),
+        data("data-parent"),
+        data("data-string-long")])),
+    ("tree-middle", [
+        "--nlines", "10",
+        "--tree-id-column", "0",
+        "--tree-parent-column", "1",
+        "--column", data("col-id"),
+        "--column", data("col-parent"),
+        "--column", data("col-tree"),
+        "--column", data("col-string"),
+        data("data-id"),
+        data("data-parent"),
+        data("data-string"),
+        data("data-string-long")]),
+    ("tree-end", [
+        "--nlines", "10",
+        "--tree-id-column", "0",
+        "--tree-parent-column", "1",
+        "--column", data("col-id"),
+        "--column", data("col-parent"),
+        "--column", data("col-string"),
+        "--column", data("col-tree"),
+        data("data-id"),
+        data("data-parent"),
+        data("data-string-long"),
+        data("data-string")]),
+    ("trunc", [
+        "--nlines", "10",
+        "--width", "40",
+        "--column", data("col-name"),
+        "--column", data("col-number"),
+        "--column", data("col-trunc"),
+        data("data-string"),
+        data("data-number"),
+        data("data-string-long")]),
+    ("right", [
+        "--nlines", "10",
+        "--column", data("col-name"),
+        "--column", data("col-number"),
+        "--column", data("col-string"),
+        data("data-string"),
+        data("data-number"),
+        data("data-string-long")]),
+    ("right-maxout", [
+        "--nlines", "10",
+        "--maxout",
+        "--width", "80",
+        "--column", data("col-name"),
+        "--column", data("col-number"),
+        data("data-string"),
+        data("data-number")]),
+    ("strictwidth", [
+        "--nlines", "10",
+        "--column", data("col-name"),
+        "--column", data("col-strict"),
+        "--column", data("col-number"),
+        data("data-string"),
+        data("data-number-tiny"),
+        data("data-number")]),
+    ("noextremes", [
+        "--nlines", "10",
+        "--width", "45",
+        "--column", data("col-name"),
+        "--column", data("col-noextremes"),
+        "--column", data("col-number"),
+        "--column", data("col-name"),
+        "--column", data("col-number"),
+        data("data-string"),
+        data("data-string-extreme"),
+        data("data-number"),
+        data("data-string"),
+        data("data-number")]),
+    ("hidden", [
+        "--nlines", "10",
+        "--column", data("col-name"),
+        "--column", data("col-hidden"),
+        "--column", data("col-number"),
+        data("data-string"),
+        data("data-string-long"),
+        data("data-number")]),
+    ("wrap", [
+        "--nlines", "10",
+        "--width", "40",
+        "--column", data("col-name"),
+        "--column", data("col-number"),
+        "--column", data("col-wrap"),
+        data("data-string"),
+        data("data-number"),
+        data("data-string-long")]),
+    ("wrap-tree", [
+        "--nlines", "10",
+        "--width", "45",
+        "--tree-id-column", "1",
+        "--tree-parent-column", "2",
+        "--column", data("col-tree"),
+        "--column", data("col-id"),
+        "--column", data("col-parent"),
+        "--column", data("col-wrap"),
+        data("data-string"),
+        data("data-id"),
+        data("data-parent"),
+        data("data-string-long")]),
+    ("wrapnl", [
+        "--nlines", "10",
+        "--column", data("col-name"),
+        "--column", data("col-number"),
+        "--column", data("col-wrapnl"),
+        data("data-string"),
+        data("data-number"),
+        data("data-string-nl")]),
+    ("wrapnl-tree", [
+        "--nlines", "10",
+        "--tree-id-column", "1",
+        "--tree-parent-column", "2",
+        "--column", data("col-tree"),
+        "--column", data("col-id"),
+        "--column", data("col-parent"),
+        "--column", data("col-wrapnl"),
+        data("data-string"),
+        data("data-id"),
+        data("data-parent"),
+        data("data-string-nl")]),
+    pytest.mark.xfail(("raw", [
+        "--nlines", "10",
+        "--raw",
+        "--column", data("col-name"),
+        "--column", data("col-number"),
+        "--column", data("col-trunc"),
+        data("data-string"),
+        data("data-number"),
+        data("data-string-long")])),
+    pytest.mark.xfail(("export", [
+        "--nlines", "10",
+        "--export",
+        "--column", data("col-name"),
+        "--column", data("col-number"),
+        "--column", data("col-trunc"),
+        data("data-string"),
+        data("data-number"),
+        data("data-string-long")])),
+    ("column-separator", [
+        "--nlines", "10",
+        "--colsep", "|",
+        "--column", data("col-name"),
+        "--column", data("col-number"),
+        "--column", data("col-trunc"),
+        data("data-string"),
+        data("data-number"),
+        data("data-string-long")])])
+def test_fromfile(name, args, capfd, posix_locale):
+    fromfile.main(args)
+    out, err = capfd.readouterr()
+    assert not err
+    with open(expected("fromfile-{!s}".format(name)), "r") as exp:
+        assert out == exp.read()
+
+def test_title(capfd, posix_locale):
+    title.main(["--width", "80"])
+    out, err = capfd.readouterr()
+    assert not err
+    with open(expected("title"), "r") as exp:
+        assert out == exp.read()

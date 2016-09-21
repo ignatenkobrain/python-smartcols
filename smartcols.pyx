@@ -100,6 +100,11 @@ cdef class Iterator:
     def reset(self):
         scols_reset_iter(self.ptr, -1)
 
+cpdef enum CellPosition:
+    left = SCOLS_CELL_FL_LEFT
+    center = SCOLS_CELL_FL_CENTER
+    right = SCOLS_CELL_FL_RIGHT
+
 cdef class Cell:
     """
     Cell.
@@ -159,11 +164,6 @@ cdef class Cell:
             else:
                 scols_cell_set_color(self.ptr, NULL)
 
-cdef dict TitlePosition = {
-    "left": SCOLS_CELL_FL_LEFT,
-    "center": SCOLS_CELL_FL_CENTER,
-    "right": SCOLS_CELL_FL_RIGHT}
-
 cdef class Title(Cell):
     """
     Title.
@@ -181,13 +181,17 @@ cdef class Title(Cell):
 
     property position:
         """
-        Position. One of `left`, `center` or `right`.
+        Position.
+
+        :getter: Get position
+        :setter: Set position (accepts only :class:`str`)
+        :type: :class:`smartcols.CellPosition`
         """
         def __get__(self):
             cdef int pos = scols_cell_get_flags(self.ptr)
-            return next(k for k, v in TitlePosition.items() if v == pos)
+            return CellPosition(pos)
         def __set__(self, basestring position not None):
-            scols_cell_set_flags(self.ptr, TitlePosition[position])
+            scols_cell_set_flags(self.ptr, CellPosition[position])
 
 cdef class Column:
     """
@@ -585,10 +589,10 @@ cdef class LinesView(TableView):
             raise IndexError("Line {:d} is out of range".format(n))
         return __refs__[<uintptr_t>ln]
 
-cdef dict TableTermForce = {
-    "auto": SCOLS_TERMFORCE_AUTO,
-    "never": SCOLS_TERMFORCE_NEVER,
-    "always": SCOLS_TERMFORCE_ALWAYS}
+cpdef enum TermForce:
+    auto = SCOLS_TERMFORCE_AUTO
+    never = SCOLS_TERMFORCE_NEVER
+    always = SCOLS_TERMFORCE_ALWAYS
 
 cdef class Table:
     """
@@ -852,9 +856,9 @@ cdef class Table:
         """
         def __get__(self):
             cdef int force = scols_table_get_termforce(self.ptr)
-            return next(k for k, v in TableTermForce.items() if v == force)
+            return TermForce(force)
         def __set__(self, basestring force not None):
-            scols_table_set_termforce(self.ptr, TableTermForce[force])
+            scols_table_set_termforce(self.ptr, TermForce[force])
 
     property termwidth:
         """

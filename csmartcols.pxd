@@ -123,6 +123,7 @@ cdef extern from "libsmartcols.h":
                                                            libscols_line       *start,
                                                            libscols_line       *end,
                                                            char               **data)
+    bint                scols_table_is_tree               (libscols_table      *table)
     int                 scols_table_enable_json           (libscols_table      *table,
                                                            bint                 value)
     bint                scols_table_is_ascii              (libscols_table      *table)

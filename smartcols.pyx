@@ -772,6 +772,16 @@ cdef class Table:
         def __set__(self, bint value):
             scols_table_enable_colors(self.ptr, value)
 
+    property tree:
+        """
+        Tree-like output.
+
+        :getter: Returns if tree-like output is expected
+        :type: bool
+        """
+        def __get__(self):
+            return scols_table_is_tree(self.ptr)
+
     property maxout:
         """
         The extra space after last column is ignored by default. The output

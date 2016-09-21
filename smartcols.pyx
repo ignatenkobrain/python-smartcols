@@ -297,7 +297,7 @@ cdef class Column:
         def __set__(self, bint value):
             self.set_flag(SCOLS_FL_RIGHT, value)
 
-    property strict_width:
+    property strictwidth:
         """
         Do not reduce width if column is empty.
         """

@@ -40,8 +40,7 @@ cpdef void init_debug(int mask=0):
 
     Don't call this function multiple times.
 
-    :param mask: Debug mask (0xffff to enable full debugging)
-    :type mask: int
+    :param int mask: Debug mask (0xffff to enable full debugging)
     """
     global DEBUG_INITIALIZED
     if DEBUG_INITIALIZED:
@@ -60,12 +59,10 @@ def cmpstr_cells(Cell c1 not None, Cell c2 not None, object data=None):
     cmpstr_cells(c1, c2, data=None)
     Shorthand wrapper around strcmp(). `data` is ignored.
 
-    :param c1: First cell
-    :type c1: smartcols.Cell
-    :param c2: Second cell
-    :type c2: smartcols.Cell
+    :param smartcols.Cell c1: First cell
+    :param smartcols.Cell c2: Second cell
     :param data: (unused) Additional data
-    :type data: object
+    :type data: :class:`object` or None
     """
     # Must be same as scols_cmpstr_cells().
     if not c1.data and not c2.data:
@@ -127,6 +124,10 @@ cdef class Cell:
     property data:
         """
         Text in cell.
+
+        :getter: Get text
+        :setter: Set text
+        :type: :class:`str` or None
         """
         def __get__(self):
             cdef const char *d = scols_cell_get_data(self.ptr)
@@ -141,9 +142,9 @@ cdef class Cell:
         """
         Private user data.
 
-        :getter: Returns data
-        :setter: Sets data
-        :type: object
+        :getter: Get user data
+        :setter: Set user data
+        :type: :class:`object` or None
         """
         def __get__(self):
             return self._userdata
@@ -154,6 +155,10 @@ cdef class Cell:
     property color:
         """
         Color for text in cell.
+
+        :getter: Get color
+        :setter: Set color
+        :type: :class:`str` or None
         """
         def __get__(self):
             cdef const char *c = scols_cell_get_color(self.ptr)
@@ -198,8 +203,7 @@ cdef class Column:
     __init__(self, name=None)
     Column.
 
-    :param name: Column name
-    :type name: str
+    :param str name: Column name
     """
 
     cdef object __weakref__
@@ -224,8 +228,8 @@ cdef class Column:
         """
         The header of column. Used in table's header.
 
-        :getter: Returns header
-        :type: weakproxy(smartcols.Cell)
+        :getter: Get header
+        :type: weakproxy to :class:`smartcols.Cell`
         """
         def __get__(self):
             return weakref.proxy(self._header)
@@ -235,9 +239,9 @@ cdef class Column:
         The title of column. Shortcut for getting/setting data for
         :attr:`smartcols.Column.header`.
 
-        :getter: Returns title
-        :setter: Sets title
-        :type: str
+        :getter: Get title
+        :setter: Set title
+        :type: :class:`str` or None
         """
         def __get__(self):
             return self.header.data
@@ -417,9 +421,9 @@ cdef class Line:
         """
         Parent line.
 
-        :getter: Returns parent line
-        :setter: Sets parent line
-        :type: smartcols.Line
+        :getter: Get parent line
+        :setter: Set parent line
+        :type: :class:`smartcols.Line`
         """
         def __get__(self):
             return self._parent
@@ -435,9 +439,9 @@ cdef class Line:
         """
         Private user data.
 
-        :getter: Returns data
-        :setter: Sets data
-        :type: object
+        :getter: Get user data
+        :setter: Set user data
+        :type: :class:`object` or None
         """
         def __get__(self):
             return self._userdata
@@ -702,8 +706,7 @@ cdef class Table:
         add_column(self, column)
         Add column to the table.
 
-        :param column: Column
-        :type column: smartcols.Column
+        :param smartcols.Column column: Column
         """
         scols_table_add_column(self.ptr, column.ptr)
         self.__columns__.add(column)
@@ -727,8 +730,7 @@ cdef class Table:
         add_line(self, line)
         Add line to the table.
 
-        :param line: Line
-        :type line: smartcols.Line
+        :param smartcols.Line line: Line
         """
         scols_table_add_line(self.ptr, line.ptr)
         self.__lines__.add(line)
@@ -755,7 +757,7 @@ cdef class Table:
 
         :getter: Get title object
         :setter: Set title text (shortcut for :attr:`smartcols.Title.data`)
-        :type: weakproxy(smartcols.Title)
+        :type: weakproxy to :class:`smartcols.Title`
         """
         def __get__(self):
             return weakref.proxy(self._title)
@@ -785,8 +787,8 @@ cdef class Table:
         """
         Tree-like output.
 
-        :getter: Returns if tree-like output is expected
-        :type: bool
+        :getter: Get if tree-like output is expected
+        :type: :class:`bool`
         """
         def __get__(self):
             return scols_table_is_tree(self.ptr)

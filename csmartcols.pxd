@@ -15,6 +15,8 @@ cdef extern from "libsmartcols.h":
         pass
     libscols_iter      *scols_new_iter                    (int                  direction)
     void                scols_free_iter                   (libscols_iter       *iter)
+    void                scols_reset_iter                  (libscols_iter       *iter,
+                                                           int                  direction)
 
     enum:
         SCOLS_CELL_FL_LEFT

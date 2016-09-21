@@ -97,6 +97,9 @@ cdef class Iterator:
     def __dealloc__(self):
         scols_free_iter(self.ptr)
 
+    def reset(self):
+        scols_reset_iter(self.ptr, -1)
+
 cdef class Cell:
     """
     Cell.
@@ -550,6 +553,7 @@ cdef class ColumnsView(TableView):
         while scols_table_next_column(self._tb.ptr, self.ptr, &cl) == 0:
             return __refs__[<uintptr_t>cl]
         else:
+            self.reset()
             raise StopIteration()
 
     def __getitem__(self, int n):
@@ -567,6 +571,7 @@ cdef class LinesView(TableView):
         while scols_table_next_line(self._tb.ptr, self.ptr, &ln) == 0:
             return __refs__[<uintptr_t>ln]
         else:
+            self.reset()
             raise StopIteration()
 
     def __getitem__(self, int n):

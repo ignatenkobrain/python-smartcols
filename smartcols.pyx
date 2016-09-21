@@ -399,10 +399,7 @@ cdef class Line:
         __refs__[<uintptr_t>self.ptr] = self
         self.__cells__ = set()
         self.__childs__ = set()
-        if parent is not None:
-            scols_line_add_child(parent.ptr, self.ptr)
-            parent.__childs__.add(self)
-            self._parent = parent
+        self.parent = parent
     def __dealloc__(self):
         scols_unref_line(self.ptr)
 
@@ -417,10 +414,18 @@ cdef class Line:
         Parent line.
 
         :getter: Returns parent line
+        :setter: Sets parent line
         :type: smartcols.Line
         """
         def __get__(self):
             return self._parent
+        def __set__(self, Line parent):
+            if self._parent is not None:
+                self._parent.__childs__.remove(self)
+            if parent is not None:
+                scols_line_add_child(parent.ptr, self.ptr)
+                parent.__childs__.add(self)
+            self._parent = parent
 
     property userdata:
         """

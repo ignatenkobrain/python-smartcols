@@ -1,6 +1,16 @@
 smartcols API Reference
 =======================
 
+.. note::
+
+   **str** represents both the types **str** and **unicode**. It is not
+   compatible with the **bytes** type.
+
+.. warning::
+
+   Don't try to use :func:`copy.copy` or :func:`copy.deepcopy`, it's not
+   implemented and can break things.
+
 Cell
 ----
 

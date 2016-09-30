@@ -154,9 +154,9 @@ cdef extern from "libsmartcols.h":
     libscols_table   *scols_copy_table                  (libscols_table         *tb)
     int               scols_sort_table                  (libscols_table         *tb,
                                                          libscols_column        *cl)
-    # TODO: getter
     int               scols_table_set_name              (libscols_table         *tb,
                                                          const char             *name)
+    const char       *scols_table_get_name              (const libscols_table   *tb)
     bint              scols_table_is_empty              (const libscols_table   *tb)
     bint              scols_table_is_tree               (const libscols_table   *tb)
     int               scols_table_reduce_termwidth      (libscols_table         *tb,
@@ -183,12 +183,12 @@ cdef extern from "libsmartcols.h":
     int               scols_table_enable_maxout         (libscols_table         *tb,
                                                          bint                    enable)
     bint              scols_table_is_maxout             (const libscols_table   *tb)
-    # TODO: getter
     int               scols_table_enable_nowrap         (libscols_table         *tb,
                                                          bint                    enable)
-    # TODO: getter
+    bint              scols_table_is_nowrap             (const libscols_table   *tb)
     int               scols_table_enable_nolinesep      (libscols_table         *tb,
                                                          bint                    enable)
+    bint              scols_table_is_nolinesep          (const libscols_table   *tb)
     libscols_column  *scols_table_new_column            (libscols_table         *tb,
                                                          char                   *name,
                                                          double                  whint,
@@ -223,9 +223,10 @@ cdef extern from "libsmartcols.h":
     int               scols_table_set_line_separator    (libscols_table         *tb,
                                                          const char             *sep)
     const char       *scols_table_get_line_separator    (const libscols_table   *tb)
-    # TODO: getter
     int               scols_table_set_symbols           (libscols_table         *tb,
                                                          libscols_symbols       *sy)
+    int               scols_table_set_default_symvols   (libscols_table         *tb)
+    libscols_symbols *scols_table_get_symbols           (const libscols_table   *tb)
     int               scols_table_set_stream            (libscols_table         *tb,
                                                          FILE                   *stream)
     FILE             *scols_table_get_stream            (const libscols_table   *tb)

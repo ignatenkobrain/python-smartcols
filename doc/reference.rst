@@ -48,6 +48,10 @@ Useful Functions
 
 .. autofunction:: smartcols.cmpstr_cells
 
+.. autofunction:: smartcols.wrapnl_chunksize
+
+.. autofunction:: smartcols.wrapnl_nextchunk
+
 Enumerations used by functions
 ------------------------------
 

@@ -69,13 +69,13 @@ cdef extern from "libsmartcols.h":
         SCOLS_FL_NOEXTREMES
         SCOLS_FL_HIDDEN
         SCOLS_FL_WRAP
-        SCOLS_FL_WRAPNL
     struct libscols_column:
         pass
     libscols_column  *scols_new_column                  ()
     void              scols_ref_column                  (libscols_column        *cl)
     void              scols_unref_column                (libscols_column        *cl)
     libscols_column  *scols_copy_column                 (const libscols_column  *cl)
+    libscols_table   *scols_column_get_table            (const libscols_column  *cl)
     libscols_cell    *scols_column_get_header           (libscols_column        *cl)
     int               scols_column_set_whint            (libscols_column        *cl,
                                                          double                  whint)
@@ -92,12 +92,29 @@ cdef extern from "libsmartcols.h":
     bint              scols_column_is_strict_width      (const libscols_column  *cl)
     bint              scols_column_is_hidden            (const libscols_column  *cl)
     bint              scols_column_is_noextremes        (const libscols_column  *cl)
+    int               scols_column_set_safechars        (libscols_column        *cl,
+                                                         const char             *safe)
+    const char       *scols_column_get_safechars        (const libscols_column  *cl)
+    size_t            scols_wrapnl_chunksize            (const libscols_column  *cl,
+                                                         const char             *data,
+                                                         void                   *userdata)
+    char             *scols_wrapnl_nextchunk            (const libscols_column  *cl,
+                                                         char                   *data,
+                                                         void                   *userdata)
+    int               scols_column_set_wrapfunc         (libscols_column        *cl,
+                                                         size_t                  (*wrap_chunksize) (const libscols_column *,
+                                                                                                    const char            *,
+                                                                                                    void                  *),
+                                                         char                   *(*wrap_nextchunk) (const libscols_column *,
+                                                                                                    char                  *,
+                                                                                                    void                  *),
+                                                         void *data)
     bint              scols_column_is_wrap              (const libscols_column  *cl)
-    bint              scols_column_is_wrapnl            (const libscols_column  *cl)
+    bint              scols_column_is_customwrap        (const libscols_column  *cl)
     int               scols_column_set_cmpfunc          (libscols_column        *cl,
-                                                         int (*cmp) (libscols_cell *a,
-                                                                     libscols_cell *b,
-                                                                     void          *),
+                                                         int                     (*cmp)            (libscols_cell         *,
+                                                                                                    libscols_cell         *,
+                                                                                                    void                  *),
                                                          void                   *data)
 
     struct libscols_line:

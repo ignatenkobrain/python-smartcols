@@ -81,6 +81,11 @@ def main(args=None):
                         continue
                     flags = line.split(",")
                     for flag in flags:
+                        if flag == "wrapnl":
+                            flag = "wrap"
+                            cl.safechars = "\n"
+                            cl.set_wrapfunc(smartcols.wrapnl_chunksize,
+                                            smartcols.wrapnl_nextchunk)
                         setattr(cl, flag, True)
                 elif nlines == 3:
                     # COLOR

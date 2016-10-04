@@ -18,7 +18,7 @@
 # cython: c_string_type=unicode, c_string_encoding=utf8, linetrace=True
 
 from libc.stdlib cimport malloc, free
-from libc.string cimport strcmp
+from libc.string cimport strcmp, strlen
 from libc.stdint cimport uintptr_t
 from cython cimport internal
 from csmartcols cimport *
@@ -82,6 +82,63 @@ cdef int cmpfunc_wrapper(libscols_cell *a, libscols_cell *b, void *data):
     cdef CmpPayload *payload = <CmpPayload *>data
 
     return (<object>payload.func)(acell, bcell, <object>payload.data)
+
+cdef struct WrapPayload:
+    void *data
+    void *func_chunksize
+    void *func_nextchunk
+
+def wrapnl_chunksize(Column cl not None, basestring data not None, object userdata=None):
+    """
+    wrapnl_chunksize(cl, data, userdata=None)
+    Split string by newline character and return size of the largest chunk.
+
+    :param smartcols.Column cl: (unused) Column
+    :param str data: String
+    :param userdata: (unused) Additional data
+    :type userdata: :class:`object` or None
+    :return: Size of the largest chunk
+    :rtype: int
+    """
+    return max((len(s) for s in data.split("\n")))
+
+cdef size_t chunksize_wrapper(const libscols_column *cl, const char *data, void *userdata):
+    if data is NULL:
+        return 0
+
+    cdef Column column = __refs__[<uintptr_t>cl]
+    cdef WrapPayload *payload = <WrapPayload *>userdata
+
+    return (<object>payload.func_chunksize)(column, data, <object>payload.data)
+
+def wrapnl_nextchunk(Column cl not None, basestring data not None, object userdata=None):
+    """
+    wrapnl_chunksize(cl, data, userdata=None)
+
+    :param smartcols.Column cl: (unused) Column
+    :param str data: String
+    :param userdata: (unused) Additional data
+    :type userdata: :class:`object` or None
+    :return: Chunk text and separator
+    :rtype: tuple
+    """
+    splitted = data.split("\n", 1)
+    return (splitted[0], "\n" if len(splitted) > 1 else None)
+
+cdef char *nextchunk_wrapper(const libscols_column *cl, char *data, void *userdata):
+    if data is NULL:
+        return NULL
+
+    cdef Column column = __refs__[<uintptr_t>cl]
+    cdef WrapPayload *payload = <WrapPayload *>userdata
+
+    cdef tuple chunk = (<object>payload.func_nextchunk)(column, data, <object>payload.data)
+    data += strlen(chunk[0].encode("UTF-8"))
+    data[0] = "\0"
+    if chunk[1] is not None:
+        return data + strlen(chunk[1].encode("UTF-8"))
+    else:
+        return NULL
 
 @internal
 cdef class Iterator:
@@ -209,8 +266,10 @@ cdef class Column:
     cdef object __weakref__
     cdef libscols_column *ptr
     cdef Cell _header
-    cdef CmpPayload *_cmp_payload
     cdef object _cmpdata
+    cdef CmpPayload *_cmp_payload
+    cdef object _wrapdata
+    cdef WrapPayload *_wrap_payload
 
     def __cinit__(self, basestring name=None):
         self.ptr = scols_new_column()
@@ -223,6 +282,7 @@ cdef class Column:
     def __dealloc__(self):
         scols_unref_column(self.ptr)
         free(self._cmp_payload)
+        free(self._wrap_payload)
 
     property header:
         """
@@ -264,11 +324,38 @@ cdef class Column:
             scols_column_set_cmpfunc(self.ptr, scols_cmpstr_cells, NULL)
         else:
             self._cmp_payload = <CmpPayload *>malloc(sizeof(CmpPayload))
-            if not self._cmp_payload:
+            if self._cmp_payload is NULL:
                 raise MemoryError()
             self._cmp_payload.data = <void *>self._cmpdata
             self._cmp_payload.func = <void *>func
             scols_column_set_cmpfunc(self.ptr, cmpfunc_wrapper, <void *>self._cmp_payload)
+
+    def set_wrapfunc(self, object func_chunksize, object func_nextchunk, object data=None):
+        """
+        set_wrapfunc(self, func_chunksize, func_nextchunk, data=None)
+        Set wrapping functions for the column.
+
+        :param object func_chunksize: Function which will return size of largest chunk
+        :param object func_nextchunk: Function which will return next chunk
+        :param object data: Additional data for function
+        """
+        if self._wrap_payload is not NULL:
+            free(self._wrap_payload)
+        self._wrapdata = data
+
+        if func_chunksize is None or func_nextchunk is None:
+            scols_column_set_wrapfunc(self.ptr, NULL, NULL, NULL)
+            return
+
+        self._wrap_payload = <WrapPayload *>malloc(sizeof(WrapPayload))
+        if self._wrap_payload is NULL:
+            raise MemoryError()
+        self._wrap_payload.func_chunksize = <void *>func_chunksize
+        self._wrap_payload.func_nextchunk = <void *>func_nextchunk
+        self._wrap_payload.data = <void *>self._wrapdata
+        scols_column_set_wrapfunc(self.ptr,
+                                  chunksize_wrapper, nextchunk_wrapper,
+                                  <void *>self._wrap_payload)
 
     cdef void set_flag(self, int flag, bint v):
         cdef int flags = scols_column_get_flags(self.ptr)
@@ -329,6 +416,20 @@ cdef class Column:
         def __set__(self, bint value):
             self.set_flag(SCOLS_FL_HIDDEN, value)
 
+    property safechars:
+        """
+        Bytes you don't want to encode on output. This is for example necessary
+        if you want to use custom wrap function based on newline character.
+        """
+        def __get__(self):
+            cdef const char *safe = scols_column_get_safechars(self.ptr)
+            return safe if safe is not NULL else None
+        def __set__(self, basestring safe):
+            if safe is not None:
+                scols_column_set_safechars(self.ptr, safe.encode("UTF-8"))
+            else:
+                scols_column_set_safechars(self.ptr, NULL)
+
     property wrap:
         """
         Wrap long lines to multi-line cells.
@@ -338,14 +439,12 @@ cdef class Column:
         def __set__(self, bint value):
             self.set_flag(SCOLS_FL_WRAP, value)
 
-    property wrapnl:
+    property customwrap:
         """
-        Wrap long lines to multi-line cells based on newline.
+        Custom wrapping is activated.
         """
         def __get__(self):
-            return scols_column_is_wrapnl(self.ptr)
-        def __set__(self, bint value):
-            self.set_flag(SCOLS_FL_WRAPNL, value)
+            return scols_column_is_customwrap(self.ptr)
 
     property color:
         """

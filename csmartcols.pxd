@@ -3,7 +3,7 @@ from libc.stdio cimport FILE
 cdef extern from "libsmartcols.h":
     void              scols_init_debug                  (int                     mask)
 
-    int               scols_parese_version_string       (const char             *ver_string)
+    int               scols_parse_version_string        (const char             *ver_string)
     int               scols_get_library_version         (const char            **ver_string)
 
     enum:

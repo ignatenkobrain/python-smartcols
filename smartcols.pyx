@@ -308,27 +308,28 @@ cdef class Column:
         def __set__(self, basestring name):
             self.header.data = name
 
-    def set_cmpfunc(self, object func not None, object data=None):
+    def set_cmpfunc(self, object func, object data=None):
         """
         set_cmpfunc(self, func, data=None)
-        Set sorting function for the column. If `func` is None then default
-        (:func:`smartcols.cmpstr_cells`) comparator will be used.
+        Set sorting function for the column.
 
-        :param function func: Comparison function (c1, c2, data)
+        :param object func: Comparison function
         :param object data: Additional data for function
         """
         if self._cmp_payload is not NULL:
             free(self._cmp_payload)
         self._cmpdata = data
-        if func == cmpstr_cells:
-            scols_column_set_cmpfunc(self.ptr, scols_cmpstr_cells, NULL)
-        else:
-            self._cmp_payload = <CmpPayload *>malloc(sizeof(CmpPayload))
-            if self._cmp_payload is NULL:
-                raise MemoryError()
-            self._cmp_payload.data = <void *>self._cmpdata
-            self._cmp_payload.func = <void *>func
-            scols_column_set_cmpfunc(self.ptr, cmpfunc_wrapper, <void *>self._cmp_payload)
+
+        if func is None:
+            scols_column_set_cmpfunc(self.ptr, NULL, NULL)
+            return
+
+        self._cmp_payload = <CmpPayload *>malloc(sizeof(CmpPayload))
+        if self._cmp_payload is NULL:
+            raise MemoryError()
+        self._cmp_payload.data = <void *>self._cmpdata
+        self._cmp_payload.func = <void *>func
+        scols_column_set_cmpfunc(self.ptr, cmpfunc_wrapper, <void *>self._cmp_payload)
 
     def set_wrapfunc(self, object func_chunksize, object func_nextchunk, object data=None):
         """

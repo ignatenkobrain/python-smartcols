@@ -23,7 +23,7 @@ from libc.stdint cimport uintptr_t
 from cython cimport internal
 from csmartcols cimport *
 
-from warnings import warn
+import warnings
 import weakref
 
 # scols_* returns pointers to struct, we need to have way to return Python
@@ -44,8 +44,8 @@ cpdef void init_debug(int mask=0):
     """
     global DEBUG_INITIALIZED
     if DEBUG_INITIALIZED:
-        warn("Calling smartcols.init_debug() multiple times has no effect. "
-             "First call initializes debugging features.", RuntimeWarning)
+        warnings.warn("Calling smartcols.init_debug() multiple times has no effect. "
+                      "First call initializes debugging features.", RuntimeWarning)
     else:
         scols_init_debug(mask)
         DEBUG_INITIALIZED = True

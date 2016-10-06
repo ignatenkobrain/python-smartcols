@@ -60,6 +60,6 @@ setup(
     url="https://github.com/ignatenkobrain/python-smartcols",
     download_url="https://github.com/ignatenkobrain/python-smartcols/archive/v{}.tar.gz".format(VERSION),
     ext_modules=cythonize(extensions, gdb_debug=DEBUG),
-    setup_requires=["Cython", "pytest-runner"],
+    setup_requires=["Cython>=0.24.0", "pytest-runner"],
     tests_require=["pytest>=2.8"],
 )

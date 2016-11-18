@@ -7,8 +7,8 @@ import sys
 from Cython.Build import cythonize
 from setuptools import setup, Extension
 
-VERSION = "0.1.2.dev0"
-DEBUG = True
+VERSION = "0.2.0"
+DEBUG = False
 
 def pkgconfig(package, min_version=None, **kw):
     flag_map = {"-I": "include_dirs", "-L": "library_dirs", "-l": "libraries"}

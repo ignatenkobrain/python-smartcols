@@ -132,7 +132,7 @@ cdef extern from "libsmartcols.h":
                                                          libscols_line          *child)
     int               scols_line_remove_child           (libscols_line          *ln,
                                                          libscols_line          *child)
-    int               scols_line_has_children           (libscols_line          *ln)
+    bint              scols_line_has_children           (libscols_line          *ln)
     int               scols_line_next_child             (libscols_line          *ln,
                                                          libscols_iter          *itr,
                                                          libscols_line         **child)

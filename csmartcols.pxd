@@ -43,6 +43,7 @@ cdef extern from "libsmartcols.h":
     int               scols_reset_cell                  (libscols_cell          *ce)
     int               scols_cell_copy_content           (libscols_cell          *dest,
                                                          const libscols_cell    *src)
+    int               scols_cell_get_alignment          (const libscols_cell    *ce)
     int               scols_cell_set_data               (libscols_cell          *ce,
                                                          const char             *data)
     int               scols_cell_refer_data             (libscols_cell          *ce,
@@ -136,6 +137,8 @@ cdef extern from "libsmartcols.h":
                                                          libscols_iter          *itr,
                                                          libscols_line         **child)
     libscols_line    *scols_line_get_parent             (const libscols_line    *ln)
+    bint              scols_line_is_ancestor            (libscols_line          *ln,
+                                                         libscols_line          *parent)
     int               scols_line_set_userdata           (libscols_line          *ln,
                                                          void                   *data)
     void             *scols_line_get_userdata           (libscols_line          *ln)
@@ -171,6 +174,7 @@ cdef extern from "libsmartcols.h":
     libscols_table   *scols_copy_table                  (libscols_table         *tb)
     int               scols_sort_table                  (libscols_table         *tb,
                                                          libscols_column        *cl)
+    int               scols_sort_table_by_tree          (libscols_table         *tb)
     int               scols_table_set_name              (libscols_table         *tb,
                                                          const char             *name)
     const char       *scols_table_get_name              (const libscols_table   *tb)
@@ -215,6 +219,9 @@ cdef extern from "libsmartcols.h":
     int               scols_table_remove_column         (libscols_table         *tb,
                                                          libscols_column        *cl)
     int               scols_table_remove_columns        (libscols_table         *tb)
+    int               scols_table_move_column           (libscols_table         *tb,
+                                                         libscols_column        *pre,
+                                                         libscols_column        *cl)
     size_t            scols_table_get_ncols             (const libscols_table   *tb)
     libscols_column  *scols_table_get_column            (libscols_table         *tb,
                                                          size_t                  n)

@@ -27,7 +27,7 @@ def pkgconfig(package, min_version=None, **kw):
             kw.setdefault("extra_compile_args", []).append(token)
     return kw
 
-flags = pkgconfig("smartcols", "2.29")
+flags = pkgconfig("smartcols", "2.30")
 if DEBUG:
     flags["define_macros"] = [("CYTHON_TRACE", 1)]
 extensions = [Extension("smartcols", ["smartcols.pyx"], **flags)]

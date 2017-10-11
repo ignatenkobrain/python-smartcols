@@ -250,7 +250,7 @@ cdef class Title(Cell):
         :type: :class:`smartcols.CellPosition`
         """
         def __get__(self):
-            cdef int pos = scols_cell_get_flags(self.ptr)
+            cdef int pos = scols_cell_get_alignment(self.ptr)
             return CellPosition(pos)
         def __set__(self, basestring position not None):
             scols_cell_set_flags(self.ptr, CellPosition[position])

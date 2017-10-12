@@ -781,9 +781,7 @@ cdef class Table:
         :rtype: str
         """
         cdef char *data = NULL
-        scols_table_enable_nolinesep(self.ptr, True)
         scols_table_print_range_to_string(self.ptr, start.ptr if start is not None else NULL, end.ptr if end is not None else NULL, &data)
-        scols_table_enable_nolinesep(self.ptr, False)
         cdef str ret = data
         free(data)
         return ret

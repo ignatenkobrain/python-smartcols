@@ -911,6 +911,27 @@ cdef class Table:
         def __set__(self, bint value):
             scols_table_enable_noheadings(self.ptr, value)
 
+    property nolinesep:
+        """
+        Enable/disable line separator printing. This is useful if you want to
+        re-printing the same line more than once (e.g. progress bar).
+        Don't use it if you're not sure.
+        """
+        def __get__(self):
+            return scols_table_is_nolinesep(self.ptr)
+        def __set__(self, bint value):
+            scols_table_enable_nolinesep(self.ptr, value)
+
+    property nowrap:
+        """
+        Never continue on next line, remove last column(s) when too large,
+        truncate last column.
+        """
+        def __get__(self):
+            return scols_table_is_nowrap(self.ptr)
+        def __set__(self, bint value):
+            scols_table_enable_nowrap(self.ptr, value)
+
     property symbols:
         """
         Used symbols. See :class:`smartcols.Symbols`.

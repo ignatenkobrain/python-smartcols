@@ -7,7 +7,7 @@ import sys
 from Cython.Build import cythonize
 from setuptools import setup, Extension
 
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 DEBUG = False
 
 def pkgconfig(package, min_version=None, **kw):

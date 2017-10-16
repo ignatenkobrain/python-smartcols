@@ -1,37 +1,38 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>smartcols API Reference &mdash; python-smartcols  documentation</title>
-    
+    <title>smartcols API Reference &#8212; python-smartcols  documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
         VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="python-smartcols  documentation" href="index.html" />
-    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="Pretty output for everyone!" href="index.html" />
    
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
-  <body role="document">  
+  <body>
+  
 
     <div class="document">
       <div class="documentwrapper">
@@ -40,24 +41,161 @@
             
   <div class="section" id="smartcols-api-reference">
 <h1>smartcols API Reference<a class="headerlink" href="#smartcols-api-reference" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><strong>str</strong> represents both the types <strong>str</strong> and <strong>unicode</strong>. It is not
+compatible with the <strong>bytes</strong> type.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Don’t try to use <a class="reference external" href="https://docs.python.org/2/library/copy.html#copy.copy" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">copy.copy()</span></code></a> or <a class="reference external" href="https://docs.python.org/2/library/copy.html#copy.deepcopy" title="(in Python v2.7)"><code class="xref py py-func docutils literal"><span class="pre">copy.deepcopy()</span></code></a>, it’s not
+implemented and can break things.</p>
+</div>
 <div class="section" id="cell">
 <h2>Cell<a class="headerlink" href="#cell" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="smartcols.Cell">
 <em class="property">class </em><code class="descclassname">smartcols.</code><code class="descname">Cell</code><a class="headerlink" href="#smartcols.Cell" title="Permalink to this definition">¶</a></dt>
-<dd><p>Cell.</p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Cell.</p>
 <p>There is no way to create cell, only way to get this object is from
 <a class="reference internal" href="#smartcols.Line" title="smartcols.Line"><code class="xref py py-class docutils literal"><span class="pre">smartcols.Line</span></code></a>.</p>
 <dl class="attribute">
 <dt id="smartcols.Cell.color">
 <code class="descname">color</code><a class="headerlink" href="#smartcols.Cell.color" title="Permalink to this definition">¶</a></dt>
 <dd><p>Color for text in cell.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">Get color</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body">Set color</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a> or None</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="smartcols.Cell.data">
 <code class="descname">data</code><a class="headerlink" href="#smartcols.Cell.data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Text in cell.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">Get text</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body">Set text</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a> or None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="smartcols.Cell.userdata">
+<code class="descname">userdata</code><a class="headerlink" href="#smartcols.Cell.userdata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Private user data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">Get user data</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body">Set user data</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a> or None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="title">
+<h2>Title<a class="headerlink" href="#title" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="smartcols.Title">
+<em class="property">class </em><code class="descclassname">smartcols.</code><code class="descname">Title</code><a class="headerlink" href="#smartcols.Title" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#smartcols.Cell" title="smartcols.Cell"><code class="xref py py-class docutils literal"><span class="pre">smartcols.Cell</span></code></a></p>
+<p>Title.</p>
+<p>There is no way to create title, only way to get this object is from
+<a class="reference internal" href="#smartcols.Table" title="smartcols.Table"><code class="xref py py-class docutils literal"><span class="pre">smartcols.Table</span></code></a>.</p>
+<dl class="attribute">
+<dt id="smartcols.Title.color">
+<code class="descname">color</code><a class="headerlink" href="#smartcols.Title.color" title="Permalink to this definition">¶</a></dt>
+<dd><p>Color for text in cell.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">Get color</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body">Set color</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a> or None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="smartcols.Title.data">
+<code class="descname">data</code><a class="headerlink" href="#smartcols.Title.data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Text in cell.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">Get text</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body">Set text</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a> or None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="smartcols.Title.position">
+<code class="descname">position</code><a class="headerlink" href="#smartcols.Title.position" title="Permalink to this definition">¶</a></dt>
+<dd><p>Position.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">Get position</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body">Set position (accepts only <a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a>)</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="#smartcols.CellPosition" title="smartcols.CellPosition"><code class="xref py py-class docutils literal"><span class="pre">smartcols.CellPosition</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="smartcols.Title.userdata">
+<code class="descname">userdata</code><a class="headerlink" href="#smartcols.Title.userdata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Private user data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">Get user data</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body">Set user data</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a> or None</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -68,12 +206,13 @@
 <dl class="class">
 <dt id="smartcols.Column">
 <em class="property">class </em><code class="descclassname">smartcols.</code><code class="descname">Column</code><span class="sig-paren">(</span><em>self</em>, <em>name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#smartcols.Column" title="Permalink to this definition">¶</a></dt>
-<dd><p>Column.</p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Column.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Column name</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – Column name</td>
 </tr>
 </tbody>
 </table>
@@ -81,6 +220,28 @@
 <dt id="smartcols.Column.color">
 <code class="descname">color</code><a class="headerlink" href="#smartcols.Column.color" title="Permalink to this definition">¶</a></dt>
 <dd><p>The default color for data cells in column and column header.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="smartcols.Column.customwrap">
+<code class="descname">customwrap</code><a class="headerlink" href="#smartcols.Column.customwrap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom wrapping is activated.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="smartcols.Column.header">
+<code class="descname">header</code><a class="headerlink" href="#smartcols.Column.header" title="Permalink to this definition">¶</a></dt>
+<dd><p>The header of column. Used in table’s header.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">Get header</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Type:</th><td class="field-body">weakproxy to <a class="reference internal" href="#smartcols.Cell" title="smartcols.Cell"><code class="xref py py-class docutils literal"><span class="pre">smartcols.Cell</span></code></a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
@@ -92,7 +253,20 @@
 <dl class="attribute">
 <dt id="smartcols.Column.name">
 <code class="descname">name</code><a class="headerlink" href="#smartcols.Column.name" title="Permalink to this definition">¶</a></dt>
-<dd><p>The title of column. Used in table&#8217;s header.</p>
+<dd><p>The title of column. Shortcut for getting/setting data for
+<a class="reference internal" href="#smartcols.Column.header" title="smartcols.Column.header"><code class="xref py py-attr docutils literal"><span class="pre">smartcols.Column.header</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">Get title</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body">Set title</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a> or None</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
@@ -102,15 +276,59 @@
 </dd></dl>
 
 <dl class="attribute">
-<dt id="smartcols.Column.strict_width">
-<code class="descname">strict_width</code><a class="headerlink" href="#smartcols.Column.strict_width" title="Permalink to this definition">¶</a></dt>
+<dt id="smartcols.Column.safechars">
+<code class="descname">safechars</code><a class="headerlink" href="#smartcols.Column.safechars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bytes you don’t want to encode on output. This is for example necessary
+if you want to use custom wrap function based on newline character.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="smartcols.Column.set_cmpfunc">
+<code class="descname">set_cmpfunc</code><span class="sig-paren">(</span><em>self</em>, <em>func</em>, <em>data=None</em><span class="sig-paren">)</span><a class="headerlink" href="#smartcols.Column.set_cmpfunc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set sorting function for the column.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>func</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><em>object</em></a>) – Comparison function</li>
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><em>object</em></a>) – Additional data for function</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="smartcols.Column.set_wrapfunc">
+<code class="descname">set_wrapfunc</code><span class="sig-paren">(</span><em>self</em>, <em>func_chunksize</em>, <em>func_nextchunk</em>, <em>data=None</em><span class="sig-paren">)</span><a class="headerlink" href="#smartcols.Column.set_wrapfunc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set wrapping functions for the column.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>func_chunksize</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><em>object</em></a>) – Function which will return size of largest chunk</li>
+<li><strong>func_nextchunk</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><em>object</em></a>) – Function which will return next chunk</li>
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><em>object</em></a>) – Additional data for function</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="smartcols.Column.strictwidth">
+<code class="descname">strictwidth</code><a class="headerlink" href="#smartcols.Column.strictwidth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Do not reduce width if column is empty.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="smartcols.Column.tree">
 <code class="descname">tree</code><a class="headerlink" href="#smartcols.Column.tree" title="Permalink to this definition">¶</a></dt>
-<dd><p>Use tree &#8220;ASCII Art&#8221;.</p>
+<dd><p>Use tree “ASCII Art”.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -139,34 +357,71 @@
 <dl class="class">
 <dt id="smartcols.Line">
 <em class="property">class </em><code class="descclassname">smartcols.</code><code class="descname">Line</code><span class="sig-paren">(</span><em>self</em>, <em>parent=None</em><span class="sig-paren">)</span><a class="headerlink" href="#smartcols.Line" title="Permalink to this definition">¶</a></dt>
-<dd><p>Line.</p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Line.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parent</strong> (<a class="reference internal" href="#smartcols.Line" title="smartcols.Line"><em>smartcols.Line</em></a>) &#8211; Parent line (used if table has column with tree-output)</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parent</strong> (<a class="reference internal" href="#smartcols.Line" title="smartcols.Line"><em>smartcols.Line</em></a>) – Parent line (used if table has column with tree-output)</td>
 </tr>
 </tbody>
 </table>
 <p>Get cell</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">table</span> <span class="o">=</span> <span class="n">smartcols</span><span class="o">.</span><span class="n">Table</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">column</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">new_column</span><span class="p">(</span><span class="s">&quot;FOO&quot;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">table</span> <span class="o">=</span> <span class="n">smartcols</span><span class="o">.</span><span class="n">Table</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">column</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">new_column</span><span class="p">(</span><span class="s2">&quot;FOO&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">line</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">new_line</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">line</span><span class="p">[</span><span class="n">column</span><span class="p">]</span>
 <span class="go">&lt;smartcols.Cell object at 0x7f8fb6cc9900&gt;</span>
 </pre></div>
 </div>
 <p>Set text to cell</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">table</span> <span class="o">=</span> <span class="n">smartcols</span><span class="o">.</span><span class="n">Table</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">column</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">new_column</span><span class="p">(</span><span class="s">&quot;FOO&quot;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">table</span> <span class="o">=</span> <span class="n">smartcols</span><span class="o">.</span><span class="n">Table</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">column</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">new_column</span><span class="p">(</span><span class="s2">&quot;FOO&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">line</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">new_line</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">line</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;bar&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;bar&quot;</span>
 </pre></div>
 </div>
 <dl class="attribute">
 <dt id="smartcols.Line.color">
 <code class="descname">color</code><a class="headerlink" href="#smartcols.Line.color" title="Permalink to this definition">¶</a></dt>
 <dd><p>The color for data cells in line.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="smartcols.Line.parent">
+<code class="descname">parent</code><a class="headerlink" href="#smartcols.Line.parent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parent line.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">Get parent line</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body">Set parent line</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="#smartcols.Line" title="smartcols.Line"><code class="xref py py-class docutils literal"><span class="pre">smartcols.Line</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="smartcols.Line.userdata">
+<code class="descname">userdata</code><a class="headerlink" href="#smartcols.Line.userdata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Private user data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">Get user data</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body">Set user data</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a> or None</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -177,11 +432,18 @@
 <dl class="class">
 <dt id="smartcols.Symbols">
 <em class="property">class </em><code class="descclassname">smartcols.</code><code class="descname">Symbols</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#smartcols.Symbols" title="Permalink to this definition">¶</a></dt>
-<dd><p>Symbols.</p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Symbols.</p>
 <dl class="attribute">
 <dt id="smartcols.Symbols.branch">
 <code class="descname">branch</code><a class="headerlink" href="#smartcols.Symbols.branch" title="Permalink to this definition">¶</a></dt>
 <dd><p>String which represents the branch part of a tree output.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="smartcols.Symbols.cell_padding">
+<code class="descname">cell_padding</code><a class="headerlink" href="#smartcols.Symbols.cell_padding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Padding of a table’s cells.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -193,7 +455,7 @@
 <dl class="attribute">
 <dt id="smartcols.Symbols.title_padding">
 <code class="descname">title_padding</code><a class="headerlink" href="#smartcols.Symbols.title_padding" title="Permalink to this definition">¶</a></dt>
-<dd><p>Padding of a table&#8217;s title.</p>
+<dd><p>Padding of a table’s title.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -205,57 +467,26 @@
 </dd></dl>
 
 </div>
-<div class="section" id="title">
-<h2>Title<a class="headerlink" href="#title" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="smartcols.Title">
-<em class="property">class </em><code class="descclassname">smartcols.</code><code class="descname">Title</code><a class="headerlink" href="#smartcols.Title" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#smartcols.Cell" title="smartcols.Cell"><code class="xref py py-class docutils literal"><span class="pre">smartcols.Cell</span></code></a></p>
-<p>Title.</p>
-<dl class="attribute">
-<dt id="smartcols.Title.position">
-<code class="descname">position</code><a class="headerlink" href="#smartcols.Title.position" title="Permalink to this definition">¶</a></dt>
-<dd><p>Position. One of <cite>left</cite>, <cite>center</cite> or <cite>right</cite>.</p>
-</dd></dl>
-
-</dd></dl>
-
-</div>
 <div class="section" id="table">
 <h2>Table<a class="headerlink" href="#table" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="smartcols.Table">
 <em class="property">class </em><code class="descclassname">smartcols.</code><code class="descname">Table</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#smartcols.Table" title="Permalink to this definition">¶</a></dt>
-<dd><p>Table.</p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Table.</p>
 <p>Create and print table</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">table</span> <span class="o">=</span> <span class="n">smartcols</span><span class="o">.</span><span class="n">Table</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">column_name</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">new_column</span><span class="p">(</span><span class="s">&quot;NAME&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">column_age</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">new_column</span><span class="p">(</span><span class="s">&quot;AGE&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">column_age</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="bp">True</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">table</span> <span class="o">=</span> <span class="n">smartcols</span><span class="o">.</span><span class="n">Table</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">column_name</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">new_column</span><span class="p">(</span><span class="s2">&quot;NAME&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">column_age</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">new_column</span><span class="p">(</span><span class="s2">&quot;AGE&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">column_age</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ln</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">new_line</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ln</span><span class="p">[</span><span class="n">column_name</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Igor Gnatenko&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ln</span><span class="p">[</span><span class="n">column_age</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;18&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ln</span><span class="p">[</span><span class="n">column_name</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Igor Gnatenko&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ln</span><span class="p">[</span><span class="n">column_age</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;18&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
 <span class="go">NAME          AGE</span>
 <span class="go">Igor Gnatenko  18</span>
 </pre></div>
 </div>
-<dl class="method">
-<dt id="smartcols.Table.__str__">
-<code class="descname">__str__</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#smartcols.Table.__str__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Print table to string.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Table</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/library/string.html#module-string" title="(in Python v2.7)">string</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 <dl class="method">
 <dt id="smartcols.Table.add_column">
 <code class="descname">add_column</code><span class="sig-paren">(</span><em>self</em>, <em>column</em><span class="sig-paren">)</span><a class="headerlink" href="#smartcols.Table.add_column" title="Permalink to this definition">¶</a></dt>
@@ -264,7 +495,7 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>column</strong> (<a class="reference internal" href="#smartcols.Column" title="smartcols.Column"><em>smartcols.Column</em></a>) &#8211; Column</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>column</strong> (<a class="reference internal" href="#smartcols.Column" title="smartcols.Column"><em>smartcols.Column</em></a>) – Column</td>
 </tr>
 </tbody>
 </table>
@@ -278,7 +509,7 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>line</strong> (<a class="reference internal" href="#smartcols.Line" title="smartcols.Line"><em>smartcols.Line</em></a>) &#8211; Line</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>line</strong> (<a class="reference internal" href="#smartcols.Line" title="smartcols.Line"><em>smartcols.Line</em></a>) – Line</td>
 </tr>
 </tbody>
 </table>
@@ -304,6 +535,21 @@ with <a class="reference internal" href="#smartcols.Column.tree" title="smartcol
 </dd></dl>
 
 <dl class="method">
+<dt id="smartcols.Table.columns">
+<code class="descname">columns</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#smartcols.Table.columns" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Columns view</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">smartcols.ColumnsView</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="smartcols.Table.json">
 <code class="descname">json</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#smartcols.Table.json" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
@@ -312,7 +558,7 @@ with <a class="reference internal" href="#smartcols.Column.tree" title="smartcol
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">JSON dictionary</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a></td>
 </tr>
 </tbody>
 </table>
@@ -322,6 +568,21 @@ with <a class="reference internal" href="#smartcols.Column.tree" title="smartcol
 <dt id="smartcols.Table.line_separator">
 <code class="descname">line_separator</code><a class="headerlink" href="#smartcols.Table.line_separator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Line separator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="smartcols.Table.lines">
+<code class="descname">lines</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#smartcols.Table.lines" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Lines view</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">smartcols.LinesView</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
@@ -374,6 +635,21 @@ constructor.</p>
 <dd><p>Do not print header.</p>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="smartcols.Table.nolinesep">
+<code class="descname">nolinesep</code><a class="headerlink" href="#smartcols.Table.nolinesep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enable/disable line separator printing. This is useful if you want to
+re-printing the same line more than once (e.g. progress bar).
+Don’t use it if you’re not sure.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="smartcols.Table.nowrap">
+<code class="descname">nowrap</code><a class="headerlink" href="#smartcols.Table.nowrap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Never continue on next line, remove last column(s) when too large,
+truncate last column.</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="smartcols.Table.str_line">
 <code class="descname">str_line</code><span class="sig-paren">(</span><em>self</em>, <em>start=None</em>, <em>end=None</em><span class="sig-paren">)</span><a class="headerlink" href="#smartcols.Table.str_line" title="Permalink to this definition">¶</a></dt>
@@ -383,15 +659,15 @@ constructor.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>start</strong> (<a class="reference internal" href="#smartcols.Line" title="smartcols.Line"><em>smartcols.Line</em></a>) &#8211; First printed line or None to print from begin of the table</li>
-<li><strong>end</strong> (<a class="reference internal" href="#smartcols.Line" title="smartcols.Line"><em>smartcols.Line</em></a>) &#8211; Last printed line or None to print all lines from <cite>start</cite></li>
+<li><strong>start</strong> (<a class="reference internal" href="#smartcols.Line" title="smartcols.Line"><em>smartcols.Line</em></a>) – First printed line or None to print from begin of the table</li>
+<li><strong>end</strong> (<a class="reference internal" href="#smartcols.Line" title="smartcols.Line"><em>smartcols.Line</em></a>) – Last printed line or None to print all lines from <cite>start</cite></li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Lines</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)">str</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></p>
 </td>
 </tr>
 </tbody>
@@ -405,10 +681,196 @@ constructor.</p>
 </dd></dl>
 
 <dl class="attribute">
+<dt id="smartcols.Table.termforce">
+<code class="descname">termforce</code><a class="headerlink" href="#smartcols.Table.termforce" title="Permalink to this definition">¶</a></dt>
+<dd><p>Force terminal output. One of <cite>auto</cite>, <cite>never</cite>, <cite>always</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="smartcols.Table.termwidth">
+<code class="descname">termwidth</code><a class="headerlink" href="#smartcols.Table.termwidth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Terminal width. The library automatically detects terminal, in case of
+failure it uses 80 characters. You can override terminal width here.</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="smartcols.Table.title">
 <code class="descname">title</code><a class="headerlink" href="#smartcols.Table.title" title="Permalink to this definition">¶</a></dt>
-<dd><p>Title of the table. Printed before table. See <a class="reference internal" href="#smartcols.Title" title="smartcols.Title"><code class="xref py py-class docutils literal"><span class="pre">smartcols.Title</span></code></a>.</p>
+<dd><p>Title of the table. Printed before table.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">Get title object</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body">Set title text (shortcut for <a class="reference internal" href="#smartcols.Title.data" title="smartcols.Title.data"><code class="xref py py-attr docutils literal"><span class="pre">smartcols.Title.data</span></code></a>)</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">weakproxy to <a class="reference internal" href="#smartcols.Title" title="smartcols.Title"><code class="xref py py-class docutils literal"><span class="pre">smartcols.Title</span></code></a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="smartcols.Table.tree">
+<code class="descname">tree</code><a class="headerlink" href="#smartcols.Table.tree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tree-like output.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">Get if tree-like output is expected</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">bool</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="useful-functions">
+<h2>Useful Functions<a class="headerlink" href="#useful-functions" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="smartcols.init_debug">
+<code class="descclassname">smartcols.</code><code class="descname">init_debug</code><span class="sig-paren">(</span><em>mask=0</em><span class="sig-paren">)</span><a class="headerlink" href="#smartcols.init_debug" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize debugging features. If <cite>mask</cite> equals to 0, then this function
+reads the <cite>LIBSMARTCOLS_DEBUG</cite> environment variable to get mask.</p>
+<p>Don’t call this function multiple times.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mask</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – Debug mask (0xffff to enable full debugging)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="smartcols.cmpstr_cells">
+<code class="descclassname">smartcols.</code><code class="descname">cmpstr_cells</code><span class="sig-paren">(</span><em>c1</em>, <em>c2</em>, <em>data=None</em><span class="sig-paren">)</span><a class="headerlink" href="#smartcols.cmpstr_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shorthand wrapper around strcmp(). <cite>data</cite> is ignored.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>c1</strong> (<a class="reference internal" href="#smartcols.Cell" title="smartcols.Cell"><em>smartcols.Cell</em></a>) – First cell</li>
+<li><strong>c2</strong> (<a class="reference internal" href="#smartcols.Cell" title="smartcols.Cell"><em>smartcols.Cell</em></a>) – Second cell</li>
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a> or None) – (unused) Additional data</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="smartcols.wrapnl_chunksize">
+<code class="descclassname">smartcols.</code><code class="descname">wrapnl_chunksize</code><span class="sig-paren">(</span><em>cl</em>, <em>data</em>, <em>userdata=None</em><span class="sig-paren">)</span><a class="headerlink" href="#smartcols.wrapnl_chunksize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Split string by newline character and return size of the largest chunk.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cl</strong> (<a class="reference internal" href="#smartcols.Column" title="smartcols.Column"><em>smartcols.Column</em></a>) – (unused) Column</li>
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – String</li>
+<li><strong>userdata</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a> or None) – (unused) Additional data</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Size of the largest chunk</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)">int</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="smartcols.wrapnl_nextchunk">
+<code class="descclassname">smartcols.</code><code class="descname">wrapnl_nextchunk</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#smartcols.wrapnl_nextchunk" title="Permalink to this definition">¶</a></dt>
+<dd><p>wrapnl_chunksize(cl, data, userdata=None)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cl</strong> (<a class="reference internal" href="#smartcols.Column" title="smartcols.Column"><em>smartcols.Column</em></a>) – (unused) Column</li>
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – String</li>
+<li><strong>userdata</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a> or None) – (unused) Additional data</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Chunk text and separator</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/functions.html#tuple" title="(in Python v2.7)">tuple</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="enumerations-used-by-functions">
+<h2>Enumerations used by functions<a class="headerlink" href="#enumerations-used-by-functions" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="smartcols.CellPosition">
+<em class="property">class </em><code class="descclassname">smartcols.</code><code class="descname">CellPosition</code><a class="headerlink" href="#smartcols.CellPosition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cell position. Currently used only in <a class="reference internal" href="#smartcols.Title" title="smartcols.Title"><code class="xref py py-class docutils literal"><span class="pre">smartcols.Title</span></code></a>.</p>
+<dl class="attribute">
+<dt id="smartcols.CellPosition.left">
+<code class="descname">left</code><a class="headerlink" href="#smartcols.CellPosition.left" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="descname">Align text to the left.</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="smartcols.CellPosition.center">
+<code class="descname">center</code><a class="headerlink" href="#smartcols.CellPosition.center" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="descname">Align text to the center.</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="smartcols.CellPosition.right">
+<code class="descname">right</code><a class="headerlink" href="#smartcols.CellPosition.right" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="descname">Align text to the right.</code></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="smartcols.TermForce">
+<em class="property">class </em><code class="descclassname">smartcols.</code><code class="descname">TermForce</code><a class="headerlink" href="#smartcols.TermForce" title="Permalink to this definition">¶</a></dt>
+<dd><p>Control terminal output usage.</p>
+<dl class="attribute">
+<dt id="smartcols.TermForce.auto">
+<code class="descname">auto</code><a class="headerlink" href="#smartcols.TermForce.auto" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="descname">Automatically detect if terminal or non-terminal output.</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="smartcols.TermForce.never">
+<code class="descname">never</code><a class="headerlink" href="#smartcols.TermForce.never" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="descname">Force to use stdout as non-terminal output.</code></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="smartcols.TermForce.always">
+<code class="descname">always</code><a class="headerlink" href="#smartcols.TermForce.always" title="Permalink to this definition">¶</a></dt>
+<dt>
+<code class="descname">Force to use stdout as terminal output.</code></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -427,24 +889,29 @@ constructor.</p>
 
 
 
+
 <p>
-<iframe src="https://ghbtns.com/github-btn.html?user=ignatenkobrain&repo=python-smartcols&type=watch&count=true&size=large"
+<iframe src="https://ghbtns.com/github-btn.html?user=ignatenkobrain&repo=python-smartcols&type=watch&count=true&size=large&v=2"
   allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
 </p>
 
 
+
+
+
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="">smartcols API Reference</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">smartcols API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#cell">Cell</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#title">Title</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#column">Column</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#line">Line</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#symbols">Symbols</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#title">Title</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#table">Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#useful-functions">Useful Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#enumerations-used-by-functions">Enumerations used by functions</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 </ul>
 
 
@@ -458,14 +925,11 @@ constructor.</p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -476,11 +940,11 @@ constructor.</p>
       &copy;2016, Igor Gnatenko.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
       
       |
-      <a href="_sources/reference.txt"
+      <a href="_sources/reference.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

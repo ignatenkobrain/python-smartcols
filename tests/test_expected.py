@@ -16,7 +16,7 @@ from .samples import fromfile, title
               data("data-id"),
               data("data-parent"),
               data("data-string-long")]),
-    pytest.mark.xfail(("tree-json", [
+    pytest.param("tree-json", [
         "--nlines", "10",
         "--json",
         "--tree-id-column", "1",
@@ -28,7 +28,7 @@ from .samples import fromfile, title
         data("data-string"),
         data("data-id"),
         data("data-parent"),
-        data("data-string-long")])),
+        data("data-string-long")], marks=pytest.mark.xfail),
     ("tree-middle", [
         "--nlines", "10",
         "--tree-id-column", "0",
@@ -149,7 +149,7 @@ from .samples import fromfile, title
         data("data-id"),
         data("data-parent"),
         data("data-string-nl")]),
-    pytest.mark.xfail(("raw", [
+    pytest.param("raw", [
         "--nlines", "10",
         "--raw",
         "--column", data("col-name"),
@@ -157,8 +157,8 @@ from .samples import fromfile, title
         "--column", data("col-trunc"),
         data("data-string"),
         data("data-number"),
-        data("data-string-long")])),
-    pytest.mark.xfail(("export", [
+        data("data-string-long")], marks=pytest.mark.xfail),
+    pytest.param("export", [
         "--nlines", "10",
         "--export",
         "--column", data("col-name"),
@@ -166,7 +166,7 @@ from .samples import fromfile, title
         "--column", data("col-trunc"),
         data("data-string"),
         data("data-number"),
-        data("data-string-long")])),
+        data("data-string-long")], marks=pytest.mark.xfail),
     ("column-separator", [
         "--nlines", "10",
         "--colsep", "|",
